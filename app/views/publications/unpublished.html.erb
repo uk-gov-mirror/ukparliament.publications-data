@@ -1,0 +1,27 @@
+
+<% if @publications.any? %>
+  <p>Total publications: <%= @total_count %></p>
+  <%== @pagy.series_nav(:bootstrap) %>
+   <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th scope="col" class="col-4">Title</th>
+          <!-- <th scope="col">Status</th> -->
+          <th scope="col">Created at</th>
+          <th scope="col">Published by</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @publications.each do |publication| %>
+          <tr>
+            <td><%= link_to publication.title, publication_path(publication.publication_work_id) %></td>
+            <!-- <td><%#= publication.status %></td> -->
+            <td><%= nice_date_time(publication.created_at) %></td>
+            <td><%= link_to publication.short_research_service_name, research_service_path(publication.research_service_id) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+<% else %>
+  <h2>No publications</h2>
+<% end %>

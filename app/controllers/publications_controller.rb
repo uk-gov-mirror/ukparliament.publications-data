@@ -19,6 +19,22 @@ class PublicationsController < AuthenticatedController
     @page_title = MAIN_PAGE_TITLE
   end
 
+  def unpublished
+    @total_count = Datagraphs::Api::GetUnpublishedPublications.new.get_total
+
+    @pagy, _ = pagy(:offset, [], count: @total_count, page: params[:page], limit: 25)
+
+    publications = Datagraphs::Api::GetUnpublishedPublications.new.process(
+      skip: @pagy.offset,
+      limit: @pagy.limit
+    )
+
+    @publications = publications.map { |pub| OpenStruct.new(pub) }
+
+    @crumb << { label: MAIN_PAGE_TITLE, url: nil }
+    @page_title = MAIN_PAGE_TITLE
+  end
+
   def show
     @publication_work_id = params[:id]
     get_publication = Datagraphs::Api::GetPublication.new
