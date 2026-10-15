@@ -25,9 +25,8 @@ module Datagraphs
         MATCH (pw:PublicationWork)
         OPTIONAL MATCH (pw)-[r7:subject]->(c:Concept)
         OPTIONAL MATCH (pw)-[r8:hasDisclaimerApplicability]->(f:DisclaimerApplicability)-[r9:hasDisclaimer]->(d:Disclaimer)
-        OPTIONAL MATCH (pw)-[r10:supersedes]->(superseded:PublicationWork)
-        OPTIONAL MATCH (supersededBy:PublicationWork)-[r11:supersedes]->(pw:PublicationWork)
-        OPTIONAL MATCH (pw)-[r12:mergedFrom]->(mf:PublicationWork)
+        OPTIONAL MATCH (pw)<-[sr1:supersedes]-(s1:Superseding)-[sr2:supersededBy]->(superpw:PublicationWork)
+        OPTIONAL MATCH (supersedes)<-[sr3:supersedes]-(s2:Superseding)-[sr4:supersededBy]->(pw:PublicationWork)       OPTIONAL MATCH (pw)-[r12:mergedFrom]->(mf:PublicationWork)
         OPTIONAL MATCH (pw)-[r13:splitFrom]->(sf:PublicationWork)
         OPTIONAL MATCH (pw)-[r14:hasWithdrawalPeriod]->(wp:WithdrawalPeriod)
         OPTIONAL MATCH (area:GeographicArea)<-[e]-(pw)
@@ -48,8 +47,8 @@ module Datagraphs
                   COLLECT_LIST(DISTINCT sf.title) AS split_from_titles,
                   COLLECT_LIST(DISTINCT wp) AS wps,
                   COLLECT_LIST(DISTINCT c) AS concepts,
-                  COLLECT_LIST(DISTINCT superseded) AS supersedes,
-                  COLLECT_LIST(DISTINCT supersededBy) AS superseded_by,
+                  COLLECT_LIST(DISTINCT supersedes) AS supersedes,
+                  COLLECT_LIST(DISTINCT superpw) AS superseded_by,
                   COLLECT_LIST(DISTINCT sf) AS split_from,
                   COLLECT_LIST(DISTINCT mf) AS merged_from,
                   COLLECT_LIST(DISTINCT area) AS geographic_areas
