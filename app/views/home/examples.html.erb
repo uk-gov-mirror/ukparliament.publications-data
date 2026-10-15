@@ -2,11 +2,16 @@
   <div class="container reading-width">
     <h1><%= yield :title %></h1>
 
+    <h2>With DOI (10102)</h2>
+
+    <p><%= link_to '"Ever Closer Union" in the EU Treaties and Court of Justice case law', publication_path(10102) %></p>
+    <p>Note: this has been added as an example.</p>
+
     <h2>With withdrawal periods</h2>
 
     <h2>Ever closer union in the EU treaties and court of justice</h2>
 
-    <a href="/publications/urn:publications-data:PublicationWork:10102">'Ever Closer Union' in the EU Treaties and Court of Justice case law</a>
+    <p><%= link_to '"Ever Closer Union" in the EU Treaties and Court of Justice case law', publication_path(10102) %></p>
 
     <p>publication work 10102, CBP 7230</p>
 
@@ -19,7 +24,8 @@
     <p>Has both disclaimers</p>
 
     <h2>Gold plating and the EU law in the UK</h2>
-    <a href="/publications/urn:publications-data:PublicationWork:3118">'Gold plating' and EU Law in the UK</a>
+
+    <p><%= link_to "'Gold plating' and EU Law in the UK", publication_path(3118) %></p>
 
     <p>Publication work 3118, SN03328</p>
 
@@ -30,15 +36,15 @@
 
     <h2>Higher education finances and funding in England</h2>
 
-    <a href="/publications/urn:publications-data:PublicationWork:17942">Higher education finances and funding in England</a>
+    <p><%= link_to "Higher education finances and funding in England", publication_path(17942) %></p>
 
-    <p>publication work 1749, CBP 10037</p>
+    <p>publication work 17942, CBP 10037</p>
 
     <p>supersedes - Higher education finance statistics (given no longer updated disclaimer)</p>
 
     <h2>Domestic Energy prices</h2>
 
-    <a href="/publications/urn:publications-data:PublicationWork:15653">Domestic energy prices</a>
+    <p><%= link_to "Domestic energy prices", publication_path(15653) %></p>
 
     <p>publication work 15653, CBP 9491</p>
 
@@ -52,20 +58,17 @@
 
     <h3>Autism policy and services: UK legislation and strategies (publication work 18377)</h3>
 
-    <a href="/publications/urn:publications-data:PublicationWork:18377">Autism policy and services: UK legislation and strategies</a>
+    <p><%= link_to "Autism policy and services: UK legislation and strategies", publication_path(18377) %></p>
+
 
     <p>England, Northern Ireland, Scotland, Wales</p>
 
     <h3>Public spending by country and region (publication work 4726)</h3>
-
-    <a href="/publications/urn:publications-data:PublicationWork:4726">Public spending by country and region</a>
-
+    <p><%= link_to "Public spending by country and region", publication_path(4726) %></p>
     <p>England, Northern Ireland, Scotland, Wales</p>
 
     <h3>Council Tax FAQs (publication work 9085)</h3>
-
-
-    <a href="/publications/urn:publications-data:PublicationWork:9085">Council tax: FAQs</a>
+    <p><%= link_to "Council tax: FAQs", publication_path(9085) %></p>
 
     <p>England, Scotland, Wales</p>
 
