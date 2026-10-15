@@ -72,6 +72,7 @@
 <% end %>
 
 <p>Reference: <b><%= @publication.ref.presence || "We do not have a reference for this publication." %></b></p>
+<p>DOI: <b><%= @publication.doi.presence || "We do not have a DOI for this publication." %></b></p>
 <p>Created on: <b><%= nice_date_time @publication.created_at %></b></p>
 <p>Updated on: <b><%= nice_date_time @publication.updated_at %></b></p>
 <p>Version: <b><%= @publication.version_number %></b></p>
