@@ -26,8 +26,9 @@ Rails.application.routes.draw do
       get 'broader-terms'
       get 'narrower-terms'
     end
-
   end
+
+  resources :disclaimers, only: [:index, :show]
 
   resources :research_services, path: 'research-services', only: [:index, :show] do
     member do
