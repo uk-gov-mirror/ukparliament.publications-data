@@ -1,16 +1,16 @@
 <% if @optional_extras.geographic_areas.any? %>
   <div class="highlight highlight-warning">
-  This work is geographically covers: <%= geographic_area_links_from_array(@optional_extras.geographic_areas) %>
+    This work is geographically covers: <%= geographic_area_links_from_array(@optional_extras.geographic_areas) %>
   </div>
 
 <% end %>
 
 <% if  @optional_extras.superseded_by.any? %>
   <div class="highlight highlight-warning">
-  This work is superseded by:
-  <% @optional_extras.superseded_by.each do |s| %>
-    <%= link_to s.title, publication_path(s.id) %>
-  <% end %>
+    This work is superseded by:
+    <% @optional_extras.superseded_by.each do |s| %>
+      <%= link_to s.title, publication_path(s.id) %>
+    <% end %>
   </div>
 <% end %>
 
@@ -27,18 +27,18 @@
 <% if @optional_extras.collections.any? %>
   <p>Is part of these collections:</p>
   <ul>
-  <% @optional_extras.collections.each do |id, name| %>
-    <li><%= link_to name, collection_path(id) %></li>
-  <% end %>
+    <% @optional_extras.collections.each do |id, name| %>
+      <li><%= link_to name, collection_path(id) %></li>
+    <% end %>
   </ul>
 <% end %>
 
 <% if @optional_extras.lead_member_for_collections.any? %>
   <p>Is lead member for these collections:</p>
   <ul>
-  <% @optional_extras.lead_member_for_collections.each do |id, name| %>
-    <li><%= link_to name, collection_path(id) %></li>
-  <% end %>
+    <% @optional_extras.lead_member_for_collections.each do |id, name| %>
+      <li><%= link_to name, collection_path(id) %></li>
+    <% end %>
   </ul>
 <% end %>
 
@@ -72,18 +72,24 @@
 <% end %>
 
 <p>Reference: <b><%= @publication.ref.presence || "We do not have a reference for this publication." %></b></p>
-<p>DOI: <b><%= @publication.doi.presence || "We do not have a DOI for this publication." %></b></p>
+<p>DOI:
+  <% if @publication.doi.presence %>
+    <%= link_to @publication.doi, "https://doi.org/#{@publication.doi}" %>
+  <% else %>
+    We do not have a DOI for this publication.
+  <% end %>
+</p>
 <p>Created on: <b><%= nice_date_time @publication.created_at %></b></p>
 <p>Updated on: <b><%= nice_date_time @publication.updated_at %></b></p>
 <p>Version: <b><%= @publication.version_number %></b></p>
 
 <% if @optional_extras.supersedes.any? %>
   <div class="highlight highlight-info">
-  This work supersedes:
+    This work supersedes:
 
-  <% @optional_extras.supersedes.each do |s| %>
-    <%= link_to s.title, publication_path(s.id) %>
-  <% end %>
+    <% @optional_extras.supersedes.each do |s| %>
+      <%= link_to s.title, publication_path(s.id) %>
+    <% end %>
   </div>
 <% end %>
 
@@ -95,7 +101,7 @@
 
 <% if @optional_extras.split_from.any? %>
   <div class="highlight highlight-info">
-  This work is split from: <%= publication_links_from_array_of_objects(@optional_extras.split_from) %>
+    This work is split from: <%= publication_links_from_array_of_objects(@optional_extras.split_from) %>
   </div>
 <% end %>
 
@@ -120,9 +126,9 @@
 <h3>Related links</h3>
 <% if @related_links.any? %>
   <ul>
-  <% @related_links.each do |related_link| %>
-    <li><%= link_to related_link.title, related_link.url %></li>
-  <% end %>
+    <% @related_links.each do |related_link| %>
+      <li><%= link_to related_link.title, related_link.url %></li>
+    <% end %>
   </ul>
 <% else %>
   <p>We do not have any related links for this expression.</p>
