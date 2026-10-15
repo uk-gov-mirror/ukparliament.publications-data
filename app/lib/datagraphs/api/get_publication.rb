@@ -138,14 +138,13 @@ module Datagraphs
       def and_optional_extras(publication_work_id:)
         params = { query: PUBLICATION_OPTIONAL_EXTRAS % { publication_work_id: publication_work_id }}
         response = call(params: params)
-        optional_extras_array = process_response(response.body)
+        oe = process_response(response.body).first
 
-        optional_extras_array.each do |oe|
-          oe["collections"] = oe["collection_ids"].zip(oe["collection_names"])
-          oe["lead_member_for_collections"] = oe["lead_collection_ids"].zip(oe["lead_collection_names"])
-        end
+        oe["collections"] = oe["collection_ids"].zip(oe["collection_names"])
+        oe["lead_member_for_collections"] = oe["lead_collection_ids"].zip(oe["lead_collection_names"])
+        oe["disclaimers"] = oe["disclaimer_ids"].zip(oe["disclaimer_labels"], oe["disclaimers_applicable_from"])
 
-        Hashie::Mash.new(optional_extras_array.first)
+        Hashie::Mash.new(oe)
       end
 
       def get_total(publication_work_id: 'urn:publications-data:PublicationWork:3549')

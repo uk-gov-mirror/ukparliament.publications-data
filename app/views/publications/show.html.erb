@@ -62,9 +62,14 @@
 <% end %>
 
 <% if @disclaimers.any? %>
-  <% @disclaimers.each do |label, from| %>
+  <% @disclaimers.each do |id, label, date| %>
     <div class="highlight highlight-warning">
-      <p><%= label %> Applicable from: <%= nice_date(from) %></p>
+      <p>
+        <%= link_to label, disclaimer_path(id) %>
+        <% if date %>
+          Applicable from: <%= nice_date(date) %>
+        <% end %>
+      </p>
     </div>
   <% end %>
 <% else %>

@@ -32,7 +32,7 @@ class PublicationsController < AuthenticatedController
     @related_links = get_publication.and_related_links(publication_work_id: @publication_work_id)
 
     # We do this differently as we need to merge the dates in there
-    @disclaimers = @optional_extras.disclaimer_ids ? @optional_extras.disclaimer_labels.zip(@optional_extras.disclaimers_applicable_from) : []
+    @disclaimers = @optional_extras.disclaimers
 
     @withdrawal_periods = sort_out_withdrawal_periods(@optional_extras.wps)
 
