@@ -1,0 +1,6 @@
+<h2>Publications with this disclaimer</h2>
+<% if @publication_works.any? %>
+  <%= render 'publications/table', publications: @publication_works, pagy: @pagy, total_count: @total_count %>
+<% else %>
+  <h2>No publications</h2>
+<% end %>

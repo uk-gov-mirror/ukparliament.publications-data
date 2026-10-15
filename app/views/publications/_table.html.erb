@@ -2,7 +2,7 @@
 
 <% if publications.any? %>
   <p>Total publications: <%= total_count %></p>
-  <%== pagy.series_nav(:bootstrap) %>
+  <%== pagy.series_nav(:bootstrap) if total_count > pagy.limit %>
    <table class="table table-bordered">
       <thead>
         <tr>

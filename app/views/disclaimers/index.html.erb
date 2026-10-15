@@ -1,0 +1,5 @@
+<ul>
+  <% @disclaimers.each do |disclaimer| %>
+    <li><%= link_to disclaimer.label, disclaimer_path(disclaimer.id) %></li>
+  <% end %>
+</ul>
