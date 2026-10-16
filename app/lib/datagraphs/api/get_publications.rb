@@ -200,7 +200,8 @@ module Datagraphs
         AND pes.label = '%{publication_status_label}'
         OPTIONAL MATCH (person:Person)<-[r4:contributionBy]-(cont:Contribution)-[r5:contributionTo]->(pe), (cont)-[r6:hasContributionType]->(contributionType:ContributionType)
         WHERE contributionType.label = '%{contribution_type_label}'
-        RETURN pe.id as publication_expression_id,
+        RETURN
+               pe.id as publication_expression_id,
                pe.publishedAt as published_at,
                pw.id as publication_work_id,
                pw.reference as ref,

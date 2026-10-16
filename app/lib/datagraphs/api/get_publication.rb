@@ -28,8 +28,9 @@ module Datagraphs
         OPTIONAL MATCH (pw)-[r7:subject]->(c:Concept)
         OPTIONAL MATCH (pw)-[r8:hasDisclaimerApplicability]->(f:DisclaimerApplicability)-[r9:hasDisclaimer]->(d:Disclaimer)
         OPTIONAL MATCH (pw)<-[sr1:supersedes]-(s1:Superseding)-[sr2:supersededBy]->(superpw:PublicationWork)
-        OPTIONAL MATCH (supersedes)<-[sr3:supersedes]-(s2:Superseding)-[sr4:supersededBy]->(pw:PublicationWork)       OPTIONAL MATCH (pw)-[r12:mergedFrom]->(mf:PublicationWork)
-        OPTIONAL MATCH (pw)-[r13:splitFrom]->(sf:PublicationWork)
+        OPTIONAL MATCH (supersedes)<-[sr3:supersedes]-(s2:Superseding)-[sr4:supersededBy]->(pw:PublicationWork)
+        OPTIONAL MATCH (mf:PublicationWork)<-[mFrom:mergedFrom]-(merging:Merging)-[mInto:mergedInto]->(pw)
+        OPTIONAL MATCH (pw:PublicationWork)<-[mFrom2:mergedFrom]-(splitting:Merging)-[mInto2:mergedInto]->(sf)
         OPTIONAL MATCH (pw)-[r14:hasWithdrawalPeriod]->(wp:WithdrawalPeriod)
         OPTIONAL MATCH (area:GeographicArea)<-[e]-(pw)
         OPTIONAL MATCH (col:Collection)-[hasMember:hasMember]->(pw)
@@ -45,12 +46,18 @@ module Datagraphs
                   COLLECT_LIST(DISTINCT f.applicableFrom) AS disclaimers_applicable_from,
                   COLLECT_LIST(DISTINCT mf.id) AS merged_from_ids,
                   COLLECT_LIST(DISTINCT mf.title) AS merged_from_titles,
+                  COLLECT_LIST(DISTINCT merging.mergedAt) AS merged_from_dates,
                   COLLECT_LIST(DISTINCT sf.id) AS split_from_ids,
                   COLLECT_LIST(DISTINCT sf.title) AS split_from_titles,
+                  COLLECT_LIST(DISTINCT splitting.mergedAt) AS split_from_dates,
                   COLLECT_LIST(DISTINCT wp) AS wps,
                   COLLECT_LIST(DISTINCT c) AS concepts,
-                  COLLECT_LIST(DISTINCT supersedes) AS supersedes,
-                  COLLECT_LIST(DISTINCT superpw) AS superseded_by,
+                  COLLECT_LIST(DISTINCT supersedes.id) AS supersedes_ids,
+                  COLLECT_LIST(DISTINCT supersedes.title) AS supersedes_titles,
+                  COLLECT_LIST(DISTINCT s2.supersededAt) AS supersedes_at,
+                  COLLECT_LIST(DISTINCT superpw.id) AS superseded_by_ids,
+                  COLLECT_LIST(DISTINCT superpw.title) AS superseded_by_titles,
+                  COLLECT_LIST(DISTINCT s1.supersededAt) AS superseded_by_ats,
                   COLLECT_LIST(DISTINCT sf) AS split_from,
                   COLLECT_LIST(DISTINCT mf) AS merged_from,
                   COLLECT_LIST(DISTINCT area) AS geographic_areas
@@ -144,6 +151,8 @@ module Datagraphs
         oe["collections"] = oe["collection_ids"].zip(oe["collection_names"])
         oe["lead_member_for_collections"] = oe["lead_collection_ids"].zip(oe["lead_collection_names"])
         oe["disclaimers"] = oe["disclaimer_ids"].zip(oe["disclaimer_labels"], oe["disclaimers_applicable_from"])
+        oe["supersedes"] = oe["supersedes_ids"].zip(oe["supersedes_titles"], oe["supersedes_at"])
+        oe["superseded_by"] = oe["superseded_by_ids"].zip(oe["superseded_by_titles"], oe["superseded_by_ats"])
 
         Hashie::Mash.new(oe)
       end
