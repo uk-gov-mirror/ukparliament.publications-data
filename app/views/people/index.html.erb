@@ -20,14 +20,14 @@
 <table class="table table-bordered">
   <thead>
     <tr>
-      <th scope="col" class="col-4">Title</th>
+      <th scope="col" class="col-8">Name</th>
       <th scope="col" class="col-4">Number of contributions</th>
     </tr>
   </thead>
   <tbody>
     <% @people.each do |person| %>
     <tr>
-      <th scope="row"> <%= link_to person.name, person_path(person.id) %></th>
+      <th scope="row"> <%= link_to person.sort_name, person_path(person.id) %></th>
       <td><%= person.number_of_contributions %></td>
     </tr>
     <% end %>

@@ -1,14 +1,13 @@
 module Datagraphs
   module Api
     class GetPeople < CypherQuery
-
       #
       # Note that a person may have multiple contributions to a publication,
       # this ensures it is publications we count rather than as owner (1) and author (2)
       #
       QUERY = <<-Q.squish
-        MATCH path_1 = (p:Person)
-        OPTIONAL MATCH path_2 = (p)<-[e:contributionBy]-(c:Contribution)-[r:contributionTo]->(pe:PublicationExpression)-[s:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
+        MATCH (p:Person)
+        OPTIONAL MATCH (p)<-[e:contributionBy]-(c:Contribution)-[r:contributionTo]->(pe:PublicationExpression)-[s:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
         WHERE pes.label = "Published"
         AND p.alphabetisationLetter = '%{letter}'
         RETURN p.displayName AS name,
@@ -27,13 +26,13 @@ module Datagraphs
       Q
 
       LETTERS = <<-Q.squish
-        MATCH res=(p:Person)
+        MATCH (p:Person)
         RETURN COLLECT_LIST(DISTINCT p.alphabetisationLetter) AS letters
         ORDER BY letters asc
       Q
 
       def total_count(letter: 'A')
-        params = { query: COUNT % { letter: letter } }
+        params = { query: COUNT % { letter: letter.upcase } }
 
         response = call(params: params)
         output = JSON.parse(response.body)
@@ -53,7 +52,8 @@ module Datagraphs
 
         response = call(params: params)
         body = process_response(response.body)
-        body.first["letters"].sort
+
+        body.first["letters"].sort.map(&:upcase).uniq
       end
     end
   end
