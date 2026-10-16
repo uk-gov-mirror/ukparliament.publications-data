@@ -78,33 +78,7 @@ module Datagraphs
         RETURN count(pw) AS total
       Q
 
-      FOR_A_COLLECTION = <<-Q.squish
-        MATCH (c:Collection)-[hasMember:hasMember]->(pw:PublicationWork)
-        WHERE c.id='%{collection_id}'
-        MATCH (pe:PublicationExpression)-[r1:expressionOf]->(pw:PublicationWork)-[r3:publishedBy]->(rs:ResearchService)
-        MATCH (pe)-[r2:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
-        OPTIONAL MATCH (person:Person)<-[r4:contributionBy]-(cont:Contribution)-[r5:contributionTo]->(pe)
-        WHERE pes.label = 'Published'
-        AND pw.id <> '%{lead_publication_work_id}'
-        RETURN pe.id as publication_expression_id,
-               pw.id as publication_work_id,
-               pw.title as title,
-               pes.label as status,
-               pe.publishedAt as published_at,
-               pe.teaserText as teaser_text,
-               pw.createdOn as created_at,
-               pe.number as version_number,
-               pe.updatedAt AS updated_at,
-               rs.shortName AS short_research_service_name,
-               rs.id AS research_service_id,
-               COLLECT_LIST(DISTINCT person.id) AS contributor_ids,
-               COLLECT_LIST(DISTINCT person.displayName) AS contributor_names
-        ORDER BY pe.publishedAt desc
-        SKIP %{skip}
-        LIMIT %{limit}
-      Q
-
-      COUNT_FOR_RESEARCH_SERVICE = <<-Q
+      COUNT_FOR_RESEARCH_SERVICE = <<-Q.squish
         MATCH (pe:PublicationExpression)-[r1:expressionOf]->(pw:PublicationWork)-[r3:publishedBy]->(rs:ResearchService)
         MATCH (pe:PublicationExpression)-[r2:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
         WHERE pes.label="Published"
@@ -112,7 +86,7 @@ module Datagraphs
         RETURN count(pw) AS total
       Q
 
-      COUNT_FOR_A_SECTION = <<-Q
+      COUNT_FOR_A_SECTION = <<-Q.squish
         MATCH (s:Section)<-[e:sectionContributionBy]-(sc:SectionContribution)-[r:sectionContributionTo]->(pe:PublicationExpression)-[r2:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
         MATCH (pe)-[t:expressionOf]->(pw:PublicationWork)
         WHERE s.id = '%{section_id}'
@@ -129,6 +103,13 @@ module Datagraphs
       FOR_A_RESEARCH_SERVICE_SUB_QUERY = <<-Q.squish
         MATCH (pe:PublicationExpression)-[r1:expressionOf]->(pw:PublicationWork)-[r3:publishedBy]->(rs:ResearchService)
         WHERE rs.id = '%{research_service_id}'
+      Q
+
+      FOR_A_COLLECTION_SUB_QUERY = <<-Q.squish
+        MATCH (c:Collection)-[hasMember:hasMember]->(pw:PublicationWork)
+        MATCH (pe:PublicationExpression)-[t:expressionOf]->(pw:PublicationWork)
+        WHERE c.id='%{collection_id}'
+        AND pw.id <> '%{lead_publication_work_id}'
       Q
 
       FOR_A_GENERIC = <<-Q.squish
@@ -159,7 +140,7 @@ module Datagraphs
         LIMIT %{limit}
       Q
 
-      COUNT_FOR_A_CONCEPT = <<-Q
+      COUNT_FOR_A_CONCEPT = <<-Q.squish
         MATCH (pw:PublicationWork)-[r1:subject]->(c:Concept)
         MATCH (pw)<-[r2:expressionOf]-(pe:PublicationExpression)-[r3:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
         WHERE c.id = '%{concept_id}'
@@ -292,6 +273,16 @@ module Datagraphs
         )
       end
 
+      def for_a_collection(collection_id:, lead_publication_work_id:, skip: 0, limit: 25)
+        for_a_generic(
+          skip: skip,
+          limit: limit,
+          sub_query: FOR_A_COLLECTION_SUB_QUERY % { collection_id: collection_id, lead_publication_work_id: lead_publication_work_id },
+          contribution_type_label: 'Author',
+          publication_expression_status_label: 'Published'
+        )
+      end
+
       def for_a_generic(skip: 0, limit: 25, sub_query:, contribution_type_label: 'Owner', publication_expression_status_label: 'Published')
         params = { query: FOR_A_GENERIC % {
           skip: skip,
@@ -322,17 +313,6 @@ module Datagraphs
         output["results"].first["total"]
       end
 
-      def for_a_collection(collection_id:, lead_publication_work_id:, skip: 0, limit: 25)
-        params = { query: FOR_A_COLLECTION % { collection_id: collection_id, lead_publication_work_id: lead_publication_work_id, skip: skip, limit: limit }}
-        response = call(params: params)
-        publications = process_response(response.body)
-
-        publications.each do |pub|
-          pub["contributors"] = pub["contributor_ids"].zip(pub["contributor_names"])
-        end
-
-        publications.map { |result| Hashie::Mash.new(result) }
-      end
 
       def for_a_disclaimer_count(disclaimer_id:)
         params = { query: COUNT_FOR_A_DISCLAIMER % { disclaimer_id: disclaimer_id }}
