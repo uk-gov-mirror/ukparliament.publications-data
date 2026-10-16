@@ -7,31 +7,21 @@
 </b></p>
 
 <% if @sections.present? %>
-  <p><%= link_to "Sections", sections_research_service_path %></p>
-<% end %>
 
-<h2>Publications</h2>
-<% if @publications.any? %>
-  <p>Total published publications: <b><%= @total_count %></b></p>
-  <%== @pagy.series_nav(:bootstrap) %>
-   <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th scope="col">Title</th>
-          <!-- <th scope="col">Status</th> -->
-          <th scope="col">Published at</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @publications.each do |publication| %>
-          <tr>
-            <td><%= link_to publication.title, publication_path(publication.publication_work_id) %></td>
-            <!-- <td><%#= publication.status %></td> -->
-            <td><%= nice_date_time(publication.published_at) %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+  <p><%= link_to "Sections", sections_research_service_path %></p>
+  <div class="block">
+    <div class="tabs">
+      <ul class="nav-tabs" role="tablist">
+        <li role="presentation"><%= link_to 'Publications', publications_research_service_path, role: "tab", class: class_names(active: current_page?(publications_research_service_path)) %></li>
+        <li role="presentation"><%= link_to 'Sections', sections_research_service_path, role: "tab", class: class_names(active: current_page?(sections_research_service_path)) %></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" role="tabpanel">
+          <%= render 'publications/table', publications: @publications, pagy: @pagy, total_count: @total_count %>
+        </div>
+      </div>
+    </div>
+  </div>
 <% else %>
-  <h2>No publications</h2>
+  <%= render 'publications/table', publications: @publications, pagy: @pagy, total_count: @total_count %>
 <% end %>

@@ -1,9 +1,8 @@
 module Datagraphs
   module Api
     class GetResearchService < CypherQuery
-
-      QUERY = <<-Q.squish
-        MATCH path1=(rs:ResearchService)-[r1:for]->(h:House)
+      DETAILS = <<-Q.squish
+        MATCH (rs:ResearchService)-[r1:for]->(h:House)
         WHERE  rs.id='%{research_service_id}'
         RETURN rs.id AS id,
                rs.name AS name,
@@ -13,11 +12,14 @@ module Datagraphs
         LIMIT 1
       Q
 
-      def process(research_service_id = 'urn:publications-data:ResearchService:1')
-        params = { query: QUERY % { research_service_id: research_service_id }}
+      def details(research_service_id = 'urn:publications-data:ResearchService:1')
+        params = { query: DETAILS % { research_service_id: research_service_id }}
 
         response = call(params: params)
-        process_response(response.body)
+        research_service = process_response(response.body).first
+        research_service["houses"] = research_service["house_ids"].zip(research_service["house_names"])
+
+        Hashie::Mash.new(research_service)
       end
     end
   end

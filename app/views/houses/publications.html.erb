@@ -8,33 +8,4 @@
   <% end %>
 </ol>
 
-<% if @publications.any? %>
-  <h2>Published publications</h2>
-  <p><%= link_to 'Unpublished publications', publications_unpublished_house_path %></p>
-  <p>Total publications: <%= @total_count %></p>
-  <%== @pagy.series_nav(:bootstrap) %>
-
-  <table class="table table-bordered">
-     <thead>
-       <tr>
-         <th scope="col" class="col-4">Title</th>
-         <!-- <th scope="col">Status</th> -->
-         <th scope="col">Created at</th>
-         <th scope="col">Published at</th>
-         <th scope="col">For</th>
-       </tr>
-     </thead>
-     <tbody>
-       <% @publications.each do |publication| %>
-         <tr>
-           <td><%= link_to publication.title, publication_path(publication.publication_work_id) %></td>
-           <!-- <td><%#= publication.status %></td> -->
-           <td><%= nice_date_time(publication.created_at) %></td>
-           <td><%= nice_date_time(publication.published_at) %></td>
-           <td><%= link_to publication.research_service_short_name, research_service_path(publication.research_service_id) %></td>
-         </tr>
-       <% end %>
-     </tbody>
-   </table>
-
-<% end %>
+<%= render 'publications/table', publications: @publications, pagy: @pagy, total_count: @total_count %>

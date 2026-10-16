@@ -13,15 +13,17 @@
     <%== @pagy.series_nav(:bootstrap) %>
   <% end %>
 
-   <table class="table table-bordered">
+   <table class="table table-bordered table-sm">
       <thead>
         <tr>
           <th scope="col" class="col-4">Title</th>
           <th scope="col">Contribution type</th>
           <th scope="col">Ordinality</th>
           <th scope="col">Reference</th>
+          <th scope="col">Version</th>
           <th scope="col">Public contribution</th>
           <th scope="col">Created at</th>
+          <th scope="col">Updated at</th>
           <th scope="col">Published at</th>
         </tr>
       </thead>
@@ -32,8 +34,10 @@
             <td><%= publication.contribution_type.join(', ') %></td>
             <td><%= publication.ordinality.join(', ') %></td>
             <td><%= publication.ref %></td>
+            <td><%= publication.version_number %></td>
             <td><%= publication.is_public ? "Yes" : "No" %></td>
             <td><%= nice_date_time(publication.created_at) %></td>
+            <td><%= nice_date_time(publication.updated_at) %></td>
             <td><%= nice_date_time(publication.published_at) %></td>
           </tr>
         <% end %>

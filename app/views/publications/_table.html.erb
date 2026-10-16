@@ -1,5 +1,5 @@
 <%# This helps us default the path helper if it hasn't been set anywhere %>
-<%# locals: (path_helper: :publication_path, publications:, pagy:, total_count:) %>
+<%# locals: (path_helper: :publication_path, publications:, pagy:, total_count:, people: 'contributors') %>
 
 <% if publications.any? %>
   <p>Total publications: <%= total_count %></p>
@@ -8,7 +8,7 @@
       <thead>
         <tr>
           <th scope="col" class="col-4">Title</th>
-          <th scope="col">Contributors</th>
+          <th scope="col"><%= people.capitalize %></th>
           <th scope="col">Published at</th>
           <th scope="col">Updated at</th>
           <th scope="col">Version</th>
@@ -22,7 +22,7 @@
             <td><%= link_to publication.title, public_send(path_helper, publication.publication_work_id) %></td>
             <td>
               <% if publication.contributors.empty? %>
-                No contributors found
+                No <%= people %> found
               <% else %>
                 <%= contributor_links_from_array(publication.contributors) %>
               <% end %>

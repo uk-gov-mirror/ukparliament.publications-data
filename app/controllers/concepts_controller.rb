@@ -35,17 +35,20 @@ class ConceptsController < AuthenticatedController
     concept = Datagraphs::Api::GetConcept.new.process(concept_id: concept_id).first
     @concept = OpenStruct.new(concept)
 
-    @total_count = Datagraphs::Api::GetPublications.new.for_a_concept_count(concept_id: concept_id)
+    get_publications = Datagraphs::Api::GetPublications.new
+
+    @total_count = get_publications.for_a_concept_count(concept_id: concept_id)
 
     @pagy, _ = pagy(:offset, [], count: @total_count, page: params[:page], limit: 25)
 
-    publications = Datagraphs::Api::GetPublications.new.for_a_concept(
+    @publications = get_publications.for_a_concept(
       concept_id: concept_id,
       skip: @pagy.offset,
       limit: @pagy.limit
     )
 
-    @publications = publications.map { |publication| OpenStruct.new(publication) }
+    ap @publications
+
     @page_title =  @concept.label
 
     @crumb << { label: MAIN_PAGE_TITLE, url: concepts_path }

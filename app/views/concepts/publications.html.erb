@@ -6,10 +6,7 @@
       <%== @pagy.series_nav(:bootstrap) %>
     <% end %>
 
-    <div class="card-list card-list-3-col">
-      <% @publications.each do |publication| %>
-        <%= render 'layouts/publication_card', publication: publication %>
-      <% end %>
-    </div>
+    <%= render 'publications/table', publications: @publications, pagy: @pagy, total_count: @total_count %>
+
   <% end %>
 <% end %>

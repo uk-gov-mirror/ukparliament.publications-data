@@ -17,11 +17,13 @@ class CollectionsController < AuthenticatedController
 
     @collection = Datagraphs::Api::GetCollection.new.details
 
-    @total_count = Datagraphs::Api::GetPublications.new.for_a_collection_count(collection_id: collection_id)
+    get_publications = Datagraphs::Api::GetPublications.new
+
+    @total_count = get_publications.for_a_collection_count(collection_id: collection_id)
 
     @pagy, _ = pagy(:offset, [], count: @total_count, page: params[:page], limit: 25)
 
-    @publication_works = Datagraphs::Api::GetPublications.new.for_a_collection(
+    @publication_works = get_publications.for_a_collection(
       collection_id: collection_id,
       lead_publication_work_id: @collection.lead_publication_work_id,
       skip: @pagy.offset,
