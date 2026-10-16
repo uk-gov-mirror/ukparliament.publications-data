@@ -29,6 +29,12 @@ Rails.application.routes.draw do
   end
 
   resources :disclaimers, only: [:index, :show]
+  resources :data_dashboards, path: 'data-dashboards', only: [:index, :show] do
+    collection do
+      get 'power-bi'
+      get 'shiny'
+    end
+  end
 
   resources :research_services, path: 'research-services', only: [:index, :show] do
     member do

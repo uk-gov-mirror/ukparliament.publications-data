@@ -2,7 +2,6 @@
   <div class="highlight highlight-warning">
     This work is geographically covers: <%= geographic_area_links_from_array(@optional_extras.geographic_areas) %>
   </div>
-
 <% end %>
 
 <% if  @optional_extras.superseded_by.any? %>
@@ -41,6 +40,22 @@
     <% end %>
   </ul>
 <% end %>
+
+<p>
+  <% if @publication.includes_power_bi_data_dashboard %>
+    Includes a <%= link_to 'Power BI Data Dashboard', power_bi_data_dashboards_path %>
+  <% else %>
+    Does not include a Power BI Data Dashboard
+  <% end %>
+</p>
+
+<p>
+  <% if @publication.includes_shiny_data_dashboard %>
+    Includes a <%= link_to 'Shiny Data Dashboard', shiny_data_dashboards_path %>
+  <% else %>
+  Does not include a Shiny Data Dashboard
+  <% end %>
+</p>
 
 <% if @withdrawal_periods.any? %>
   <% @withdrawal_periods.each do |wp| %>

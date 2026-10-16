@@ -12,6 +12,8 @@ module Datagraphs
                   pw.doi AS doi,
                   pes.label AS status,
                   pw.reference AS ref,
+                  pw.includesPowerBiDataDashboard AS includes_power_bi_data_dashboard,
+                  pw.includesShinyDataDashboard AS includes_shiny_data_dashboard,
                   rs.id AS research_service_id,
                   rs.name AS research_service_name,
                   pw.createdOn AS created_at,
