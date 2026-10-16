@@ -47,8 +47,6 @@ class ConceptsController < AuthenticatedController
       limit: @pagy.limit
     )
 
-    ap @publications
-
     @page_title =  @concept.label
 
     @crumb << { label: MAIN_PAGE_TITLE, url: concepts_path }
