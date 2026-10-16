@@ -31,7 +31,6 @@ module Datagraphs
         OPTIONAL MATCH (supersedes)<-[sr3:supersedes]-(s2:Superseding)-[sr4:supersededBy]->(pw:PublicationWork)
         OPTIONAL MATCH (mf:PublicationWork)<-[mFrom:mergedFrom]-(merging:Merging)-[mInto:mergedInto]->(pw)
         OPTIONAL MATCH (pw:PublicationWork)<-[mFrom2:mergedFrom]-(splitting:Merging)-[mInto2:mergedInto]->(sf)
-        OPTIONAL MATCH (pw)-[r13:splitFrom]->(sf:PublicationWork)
         OPTIONAL MATCH (pw)-[r14:hasWithdrawalPeriod]->(wp:WithdrawalPeriod)
         OPTIONAL MATCH (area:GeographicArea)<-[e]-(pw)
         OPTIONAL MATCH (col:Collection)-[hasMember:hasMember]->(pw)
