@@ -206,9 +206,23 @@ module Datagraphs
         RETURN COUNT(pw) AS total
       Q
 
+      COUNT_FOR_A_HOUSE = <<-Q.squish
+        MATCH (pw:PublicationWork)-[s:publishedBy]->(rs:ResearchService)-[f:for]->(house:House)
+        MATCH (pes:PublicationExpressionStatus)<-[r2:hasPublicationExpressionStatus]-(pe:PublicationExpression)-[r1:expressionOf]->(pw:PublicationWork)
+        WHERE pes.label = '%{publication_status_label}'
+        AND house.id = '%{house_id}'
+        RETURN COUNT(DISTINCT pw) AS total
+      Q
+
       FOR_A_GEOGRAPHIC_AREA_SUB_QUERY = <<-Q.squish
         MATCH (area:GeographicArea)<-[e]-(pw:PublicationWork)<-[r1:expressionOf]-(pe:PublicationExpression)-[r2:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
         WHERE area.id = '%{geographic_area_id}'
+      Q
+
+      FOR_A_HOUSE_SUB_QUERY = <<-Q.squish
+        MATCH (pw:PublicationWork)-[s:publishedBy]->(rs:ResearchService)-[f:for]->(house:House)
+        MATCH (pe)-[t:expressionOf]->(pw:PublicationWork)
+        WHERE house.id = '%{house_id}'
       Q
 
       UNPUBLISHED_FOR_A_HOUSE_COUNT = <<-Q.squish
@@ -275,6 +289,16 @@ module Datagraphs
           limit: limit,
           sub_query: FOR_A_GEOGRAPHIC_AREA_SUB_QUERY % { geographic_area_id: geographic_area_id },
           contribution_type_label: 'Owner',
+          publication_expression_status_label: 'Published'
+        )
+      end
+
+      def for_a_house(house_id:, skip: 0, limit: 25)
+        for_a_generic(
+          skip: skip,
+          limit: limit,
+          sub_query: FOR_A_HOUSE_SUB_QUERY % { house_id: house_id },
+          contribution_type_label: 'Author',
           publication_expression_status_label: 'Published'
         )
       end
@@ -360,7 +384,12 @@ module Datagraphs
         output["results"].first["total"]
       end
 
-
+      def for_a_house_count(house_id:, publication_status_label: "Published")
+        params = { query: COUNT_FOR_A_HOUSE % {  house_id: house_id, publication_status_label: publication_status_label }}
+        response = call(params: params)
+        output = JSON.parse(response.body)
+        output["results"].first["total"]
+      end
 
       def all(skip: 0, limit: 25, other_where_clause: '')
         params = { query: QUERY % { skip: skip, limit: limit, other_where_clause: other_where_clause }}

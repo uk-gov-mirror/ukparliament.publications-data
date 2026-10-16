@@ -17,11 +17,12 @@ class HousesController < AuthenticatedController
   def publications
     house_id = params[:id]
 
-    @total_count = Datagraphs::Api::GetHouse.new.house_with_publications_with_a_status_count
+    @total_count =  Datagraphs::Api::GetPublications.new.for_a_house_count(house_id: house_id)
     @pagy, _ = pagy(:offset, [], count: @total_count, page: params[:page], limit: 25)
 
-    @house = process_house(house_id)
-    @publications = process_publications(
+    @house = Datagraphs::Api::GetHouse.new.details(house_id)
+
+    @publications = Datagraphs::Api::GetPublications.new.for_a_house(
       house_id: house_id,
       skip: @pagy.offset,
       limit: @pagy.limit
@@ -71,16 +72,7 @@ class HousesController < AuthenticatedController
   end
 
   def process_house(house_id)
-    house = Datagraphs::Api::GetHouse.new.process(house_id).first
 
-    house["research_services"] = house["research_service_ids"].zip(house["research_service_names"])
-
-    OpenStruct.new(house)
   end
 
-  def process_publications(house_id:, skip:, limit:)
-    publications = Datagraphs::Api::GetHouse.new.house_with_publications_with_a_status(house_id: house_id, publication_status_label: "Published", skip: skip, limit: limit)
-
-    publications.map { |publication| OpenStruct.new(publication) }
-  end
 end
