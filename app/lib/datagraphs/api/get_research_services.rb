@@ -1,11 +1,10 @@
 module Datagraphs
   module Api
     class GetResearchServices < CypherQuery
-
-      QUERY = <<-Q.squish
-        MATCH path1 = (rs:ResearchService)-[r1:for]->(h:House)
-        MATCH path2 = (pe:PublicationExpression)-[r2:expressionOf]->(pw:PublicationWork)-[r3:publishedBy]->(rs)
-        MATCH path3 = (pe)-[r4:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
+      ALL = <<-Q.squish
+        MATCH (rs:ResearchService)-[r1:for]->(h:House)
+        MATCH (pe:PublicationExpression)-[r2:expressionOf]->(pw:PublicationWork)-[r3:publishedBy]->(rs)
+        MATCH (pe)-[r4:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
         WHERE pes.label = "Published"
         RETURN rs.id AS id,
               rs.name AS name,
@@ -16,10 +15,15 @@ module Datagraphs
         ORDER BY name ASC
       Q
 
-      def process
-        params = { query: QUERY }
+      def all
+        params = { query: ALL }
         response = call(params: params)
-        process_response(response.body)
+        research_services = process_response(response.body)
+
+        research_services.map do |research_service|
+          research_service["houses"] = research_service["house_ids"].zip(research_service["house_names"])
+          Hashie::Mash.new(research_service)
+        end
       end
     end
   end

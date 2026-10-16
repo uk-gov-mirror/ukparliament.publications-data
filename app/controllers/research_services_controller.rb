@@ -3,23 +3,34 @@ require 'ostruct'
 class ResearchServicesController < AuthenticatedController
   include Pagy::Method
 
-  def index
-    @research_services = process_research_services
+  MAIN_PAGE_TITLE = "Research services"
 
-    @crumb << { label: 'Research services', url: nil }
-    @page_title = "Research services"
+  def index
+    @research_services = Datagraphs::Api::GetResearchServices.new.all
+    @page_title = MAIN_PAGE_TITLE
+
+    @crumb << { label: @page_title, url: nil }
   end
 
   def show
-    research_service_id = params[:id]
-    redirect_to publications_research_service_path(research_service_id)
+    redirect_to publications_research_service_path(params[:id])
   end
 
   def publications
     research_service_id = params[:id]
-    @research_service = process_research_service(research_service_id)
+    @research_service = Datagraphs::Api::GetResearchService.new.details(research_service_id)
 
-    @publications = get_publications(research_service_id)
+    get_publications = Datagraphs::Api::GetPublications.new
+    @total_count =get_publications.count_for_a_research_service(research_service_id)
+
+    @pagy, _ = pagy(:offset, [], count: @total_count, page: params[:page], limit: 25)
+
+    @publications = get_publications.for_a_research_service(
+      research_service_id: research_service_id,
+      skip: @pagy.offset,
+      limit: @pagy.limit
+    )
+
     @sections = Datagraphs::Api::GetSections.new.for_a_research_service(research_service_id)
 
     @page_title =  @research_service.name
@@ -31,7 +42,7 @@ class ResearchServicesController < AuthenticatedController
 
   def sections
     research_service_id = params[:id]
-    @research_service = process_research_service(research_service_id)
+    @research_service = Datagraphs::Api::GetResearchService.new.details(research_service_id)
 
     @sections = Datagraphs::Api::GetSections.new.for_a_research_service(research_service_id)
 
@@ -40,39 +51,5 @@ class ResearchServicesController < AuthenticatedController
     @crumb << { label: 'Research services', url: research_services_path }
     @crumb << { label: @page_title, url: research_service_path(research_service_id) }
     @crumb << { label: 'Sections', url: nil }
-  end
-
-  private
-
-  def get_publications(research_service_id)
-    @total_count = Datagraphs::Api::GetPublications.new.get_count_for_a_research_service(research_service_id)
-
-    @pagy, _ = pagy(:offset, [], count: @total_count, page: params[:page], limit: 25)
-
-    publications = Datagraphs::Api::GetPublications.new.get_for_a_research_service(
-      research_service_id: research_service_id,
-      skip: @pagy.offset,
-      limit: @pagy.limit
-    )
-
-    @publications = publications.map { |pub| OpenStruct.new(pub) }
-  end
-
-  def process_research_services
-    research_services = Datagraphs::Api::GetResearchServices.new.process
-
-    research_services.each do |rs|
-      rs["houses"] = rs["house_ids"].zip(rs["house_names"])
-    end
-
-    research_services.map { |research_service| OpenStruct.new(research_service) }
-  end
-
-  def process_research_service(research_service_id)
-    research_service = Datagraphs::Api::GetResearchService.new.process(research_service_id).first
-
-    research_service["houses"] = research_service["house_ids"].zip(research_service["house_names"])
-
-    OpenStruct.new(research_service)
   end
 end
