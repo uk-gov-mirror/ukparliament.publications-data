@@ -7,8 +7,12 @@
 <% if  @optional_extras.superseded_by.any? %>
   <div class="highlight highlight-warning">
     This work is superseded by:
-    <% @optional_extras.superseded_by.each do |s| %>
-      <%= link_to s.title, publication_path(s.id) %>
+
+    <% @optional_extras.superseded_by.each do |id, title, date| %>
+      <%= link_to title, publication_path(id) %>
+      <% if date %>
+        on <%= nice_date_time(date) %>
+      <% end %>
     <% end %>
   </div>
 <% end %>
@@ -107,8 +111,11 @@
   <div class="highlight highlight-info">
     This work supersedes:
 
-    <% @optional_extras.supersedes.each do |s| %>
-      <%= link_to s.title, publication_path(s.id) %>
+    <% @optional_extras.supersedes.each do |id, title, date| %>
+      <%= link_to title, publication_path(id) %>
+      <% if date %>
+        on <%= nice_date_time(date) %>
+      <% end %>
     <% end %>
   </div>
 <% end %>
@@ -116,12 +123,18 @@
 <% if @optional_extras.merged_from.any? %>
   <div class="highlight highlight-info">
     This work is merged from: <%= publication_links_from_array_of_objects(@optional_extras.merged_from) %>
+    <% if @optional_extras.merged_from_dates %>
+      on: <%= @optional_extras.merged_from_dates.map { |d| nice_date_time(d) }.join(', ') %>
+    <% end %>
   </div>
 <% end %>
 
 <% if @optional_extras.split_from.any? %>
   <div class="highlight highlight-info">
     This work is split from: <%= publication_links_from_array_of_objects(@optional_extras.split_from) %>
+    <% if @optional_extras.split_from_dates %>
+      on: <%= @optional_extras.split_from_dates.map { |d| nice_date_time(d) }.join(', ') %>
+    <% end %>
   </div>
 <% end %>
 
