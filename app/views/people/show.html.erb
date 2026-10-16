@@ -1,3 +1,12 @@
+<p>
+  <% if @person.orcid %>
+    Orcid: <%= link_to @person.orcid, "https://orcid.org/#{@person.orcid}" %>
+  <% else %>
+    Orcid: No Orcid set
+  <% end %>
+</p>
+
+
 <% if @publications.any? %>
   <p>Total published publications: <%= @total_count %></p>
   <% if @total_count > @publications.count %>

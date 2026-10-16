@@ -8,8 +8,6 @@ module Datagraphs
           MATCH getPublicationWork=(pe:PublicationExpression)-[r5:expressionOf]->(pw:PublicationWork)
           WHERE p.id='%{person_id}' AND pes.label='Published'
           RETURN
-            p.id AS person_id,
-            p.displayName AS person_name,
             collect(c.ordinality) AS ordinality,
             c.isPublic AS is_public,
             pe.publishedAt AS published_at,
@@ -32,13 +30,14 @@ module Datagraphs
           RETURN COUNT(DISTINCT pe) AS total
       Q
 
-      def process(person_id: 'urn:publications-data:Person:294313', skip: 0, limit: 25)
+      def all(person_id: 'urn:publications-data:Person:294313', skip: 0, limit: 25)
         params = { query: QUERY % { person_id: person_id, skip: skip, limit: limit }}
         response = call(params: params)
-        process_response(response.body)
+        body = process_response(response.body)
+        body.map { |record| Hashie::Mash.new(record) }
       end
 
-      def get_total(person_id: 'urn:publications-data:Person:294313')
+      def total_count_for(person_id: 'urn:publications-data:Person:294313')
         params = { query: COUNT % { person_id: person_id }}
         response = call(params: params)
         output = JSON.parse(response.body)
