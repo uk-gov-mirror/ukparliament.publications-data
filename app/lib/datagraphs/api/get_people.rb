@@ -32,7 +32,7 @@ module Datagraphs
         ORDER BY letters asc
       Q
 
-      def get_total(letter: 'A')
+      def total_count(letter: 'A')
         params = { query: COUNT % { letter: letter } }
 
         response = call(params: params)
@@ -40,18 +40,20 @@ module Datagraphs
         output["results"].first["total"]
       end
 
-      def process(letter: "A", skip: 0, limit: 25)
+      def all(letter: "A", skip: 0, limit: 25)
         params = { query: QUERY % { skip: skip, limit: limit, letter: letter }}
 
         response = call(params: params)
-        process_response(response.body)
+        body = process_response(response.body)
+        body.map { |record| Hashie::Mash.new(record) }
       end
 
-      def get_letters
+      def letters
         params = { query: LETTERS }
 
         response = call(params: params)
-        process_response(response.body)
+        body = process_response(response.body)
+        body.first["letters"].sort
       end
     end
   end
