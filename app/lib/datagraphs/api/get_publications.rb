@@ -7,6 +7,7 @@ module Datagraphs
         MATCH (pe)-[r2:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
         OPTIONAL MATCH (person:Person)<-[r4:contributionBy]-(cont:Contribution)-[r5:contributionTo]->(pe)
         WHERE pes.label = 'Published'
+        %{other_where_clause}
         RETURN pe.id as publication_expression_id,
                pw.id as publication_work_id,
                pw.title as title,
@@ -23,6 +24,14 @@ module Datagraphs
         ORDER BY pe.publishedAt desc
         SKIP %{skip}
         LIMIT %{limit}
+      Q
+
+      COUNT = <<-Q
+        MATCH (pe:PublicationExpression)-[r1:expressionOf]->(pw:PublicationWork)
+        MATCH (pe:PublicationExpression)-[r2:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
+        WHERE pes.label="Published"
+        %{other_where_clause}
+        RETURN count(pw) AS total
       Q
 
       COUNT_FOR_A_DISCLAIMER = <<-Q.squish
@@ -118,13 +127,6 @@ module Datagraphs
         MATCH (pe:PublicationExpression)-[r2:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
         WHERE pes.label="Published"
         AND rs.id = '%{research_service_id}'
-        RETURN count(pw) AS total
-      Q
-
-      COUNT = <<-Q
-        MATCH (pe:PublicationExpression)-[r1:expressionOf]->(pw:PublicationWork)
-        MATCH (pe:PublicationExpression)-[r2:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
-        WHERE pes.label="Published"
         RETURN count(pw) AS total
       Q
 
@@ -255,13 +257,6 @@ module Datagraphs
         output["results"].first["total"]
       end
 
-      def get_total
-        params = { query: COUNT }
-        response = call(params: params)
-        output = JSON.parse(response.body)
-        output["results"].first["total"]
-      end
-
       def for_a_section_count(section_id:)
         params = { query: COUNT_FOR_A_SECTION % {  section_id: section_id }}
         response = call(params: params)
@@ -319,7 +314,6 @@ module Datagraphs
         publications.map { |result| Hashie::Mash.new(result) }
       end
 
-
       def for_a_concept_count(concept_id:)
         params = { query: COUNT_FOR_A_CONCEPT % {  concept_id: concept_id }}
         response = call(params: params)
@@ -358,8 +352,8 @@ module Datagraphs
         publications.map { |result| Hashie::Mash.new(result) }
       end
 
-      def all(skip: 0, limit: 25)
-        params = { query: QUERY % { skip: skip, limit: limit }}
+      def all(skip: 0, limit: 25, other_where_clause: '')
+        params = { query: QUERY % { skip: skip, limit: limit, other_where_clause: other_where_clause }}
         response = call(params: params)
         publications = process_response(response.body)
 
@@ -368,6 +362,37 @@ module Datagraphs
         end
 
         publications.map { |result| Hashie::Mash.new(result) }
+      end
+
+      def get_total(other_where_clause: '')
+        params = { query: COUNT % { other_where_clause: other_where_clause }}
+        response = call(params: params)
+        output = JSON.parse(response.body)
+        output["results"].first["total"]
+      end
+
+      def all_data_dashboards(skip: 0, limit: 25)
+        all(skip: skip, limit: limit, other_where_clause: 'AND (pw.includesPowerBiDataDashboard = TRUE OR pw.includesShinyDataDashboard = TRUE)')
+      end
+
+      def data_dashboards_count
+        get_total(other_where_clause: 'AND (pw.includesPowerBiDataDashboard = TRUE OR pw.includesShinyDataDashboard = TRUE)')
+      end
+
+      def power_bi_data_dashboards_count
+        get_total(other_where_clause: 'AND pw.includesPowerBiDataDashboard = TRUE')
+      end
+
+      def shiny_data_dashboards_count
+        get_total(other_where_clause: 'AND pw.includesShinyDataDashboard = TRUE')
+      end
+
+      def all_power_bi_data_dashboards(skip: 0, limit: 25)
+        all(skip: skip, limit: limit, other_where_clause: 'AND pw.includesPowerBiDataDashboard = TRUE')
+      end
+
+      def all_shiny_data_dashboards(skip: 0, limit: 25)
+        all(skip: skip, limit: limit, other_where_clause: 'AND pw.includesShinyDataDashboard = TRUE')
       end
 
       def unpublished_for_a_house(house_id:, skip: 0, limit: 25)

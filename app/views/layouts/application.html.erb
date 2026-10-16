@@ -7,9 +7,9 @@
 
   <body class="brand-bicameral">
     <%= render 'library_design/header/header' do %>
-      <%= render 'layouts/login_in_out' unless $DISABLE_AUTHENTICATION %>
       <%= link_to 'People', people_path %>&middot;
       <%= link_to 'Publications', publications_path %>&middot;
+      <%= link_to 'Data dashboards', data_dashboards_path %>&middot;
       <%= link_to 'Houses', houses_path %>&middot;
       <%= link_to 'Research services', research_services_path %>&middot;
       <%= link_to 'Sections', sections_path %>&middot;

@@ -1,4 +1,5 @@
-<%# locals: (publications:, pagy:, total_count:) %>
+<%# This helps us default the path helper if it hasn't been set anywhere %>
+<%# locals: (path_helper: :publication_path, publications:, pagy:, total_count:) %>
 
 <% if publications.any? %>
   <p>Total publications: <%= total_count %></p>
@@ -17,7 +18,8 @@
       <tbody>
         <% publications.each do |publication| %>
           <tr>
-            <td><%= link_to publication.title, publication_path(publication.publication_work_id) %></td>
+            <%# This is slightly funky, but allows us to have different paths for things like data dashboards, whilst sharing the partial %>
+            <td><%= link_to publication.title, public_send(path_helper, publication.publication_work_id) %></td>
             <td>
               <% if publication.contributors.empty? %>
                 No contributors found
