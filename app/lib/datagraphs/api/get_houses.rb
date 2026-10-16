@@ -1,9 +1,8 @@
 module Datagraphs
   module Api
     class GetHouses < CypherQuery
-
       QUERY = <<-Q
-        MATCH p = (house:House)<-[r1:for]-(rs:ResearchService)
+        MATCH (house:House)<-[r1:for]-(rs:ResearchService)
         RETURN house.id as id,
                house.name as name,
                house.shortName AS short_name,
@@ -12,12 +11,17 @@ module Datagraphs
         ORDER BY house.name
       Q
 
-      def process
+      def all
         Rails.logger.info("Calling get houses")
         params = { query: QUERY }
         response = call(params: params)
         Rails.logger.info("Called get houses")
-        process_response(response.body)
+        houses = process_response(response.body)
+        houses.each do |house|
+          house["research_services"] = house["research_service_ids"].zip(house["research_service_names"])
+        end
+
+        houses.map { |house| Hashie::Mash.new(house) }
       end
     end
   end
