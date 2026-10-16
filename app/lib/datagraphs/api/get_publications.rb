@@ -180,6 +180,12 @@ module Datagraphs
         RETURN COUNT(DISTINCT pw) AS total
       Q
 
+      FOR_A_CONCEPT_SUB_QUERY  = <<-Q.squish
+        MATCH (pw:PublicationWork)-[sub:subject]->(c:Concept)
+        MATCH (pw)<-[eo:expressionOf]-(pe:PublicationExpression)-[hpes:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
+        WHERE c.id = '%{concept_id}'
+      Q
+
       FOR_A_GEOGRAPHIC_AREA_SUB_QUERY = <<-Q.squish
         MATCH (area:GeographicArea)<-[e]-(pw:PublicationWork)<-[r1:expressionOf]-(pe:PublicationExpression)-[r2:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
         WHERE area.id = '%{geographic_area_id}'
@@ -231,6 +237,16 @@ module Datagraphs
         response = call(params: params)
         output = JSON.parse(response.body)
         output["results"].first["total"]
+      end
+
+      def for_a_concept(concept_id:, skip: 0, limit: 25)
+        for_a_generic(
+          skip: skip,
+          limit: limit,
+          sub_query: FOR_A_CONCEPT_SUB_QUERY % { concept_id: concept_id },
+          contribution_type_label: 'Author',
+          publication_expression_status_label: 'Published'
+        )
       end
 
       def for_a_section(section_id:, skip: 0, limit: 25)
@@ -338,12 +354,6 @@ module Datagraphs
         response = call(params: params)
         output = JSON.parse(response.body)
         output["results"].first["total"]
-      end
-
-      def for_a_concept(concept_id:, skip: 0, limit: 25)
-        params = { query: FOR_A_CONCEPT % { concept_id: concept_id, skip: skip, limit: limit }}
-        response = call(params: params)
-        process_response(response.body)
       end
 
       def for_a_geographic_area_count(geographic_area_id:, publication_status_label: "Published")
