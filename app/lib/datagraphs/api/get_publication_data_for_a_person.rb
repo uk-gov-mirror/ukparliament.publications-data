@@ -17,7 +17,9 @@ module Datagraphs
             collect(ct.label) AS contribution_type,
             pw.reference AS ref,
             pw.publishedBy AS published_by,
-            pe.createdAt AS created_at
+            pe.createdAt AS created_at,
+            pe.updatedAt AS updated_at,
+            pe.number AS version_number
           ORDER BY published_at desc, title asc
           SKIP %{skip}
           LIMIT %{limit}
