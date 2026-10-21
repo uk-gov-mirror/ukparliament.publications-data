@@ -15,7 +15,7 @@ class CollectionsController < AuthenticatedController
   def show
     collection_id = params[:id]
 
-    @collection = Datagraphs::Api::GetCollection.new.details
+    @collection = Datagraphs::Api::GetCollection.new.details(collection_id: collection_id)
 
     get_publications = Datagraphs::Api::GetPublications.new
 
