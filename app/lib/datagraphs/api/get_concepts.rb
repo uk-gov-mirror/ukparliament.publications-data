@@ -1,8 +1,7 @@
 module Datagraphs
   module Api
     class GetConcepts < CypherQuery
-
-      QUERY = <<-Q.squish
+      ALL_FOR = <<-Q.squish
         MATCH (broaderTerms:Concept)<-[r1:broaderTerm]-(concept:Concept)<-[r2:broaderTerm]-(narrowerTerms:Concept)
         MATCH (concept)<-[s:subject]-(pw:PublicationWork)<-[r3:expressionOf]-(pe:PublicationExpression)-[r4:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
         WHERE concept.alphabetisationLetter = '%{letter}'
@@ -11,6 +10,19 @@ module Datagraphs
                 COUNT(DISTINCT narrowerTerms.id) AS narrower_terms_count,
                 COUNT(DISTINCT pw.id) AS publications_count,
                 COUNT(DISTINCT broaderTerms.id) AS broader_terms_count
+                ORDER BY concept_name ASC
+        SKIP %{skip}
+        LIMIT %{limit}
+      Q
+
+      PROMOTED_BY = <<-Q.squish
+        MATCH (concept)<-[e:conceptPromotionOf]-(b:ConceptPromotion)-[f:conceptPromotionBy]->(rs:ResearchService)
+        WHERE rs.id = '%{research_service_id}'
+        OPTIONAL MATCH (concept)<-[s:subject]-(pw:PublicationWork)<-[r3:expressionOf]-(pe:PublicationExpression)-[r4:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
+        WHERE pes.label = 'Published'
+        RETURN  DISTINCT(concept.id) AS id,
+                concept.label AS concept_name,
+                COUNT(DISTINCT pw.id) AS publications_count
                 ORDER BY concept_name ASC
         SKIP %{skip}
         LIMIT %{limit}
@@ -32,6 +44,12 @@ module Datagraphs
         MATCH p = (a:Concept)<-[e:broaderTerm]-(b:Concept)
         WHERE a.alphabetisationLetter = '%{letter}'
         RETURN count(a) AS total
+      Q
+
+      COUNT_FOR_PROMOTED_BY = <<-Q.squish
+        MATCH (concept:Concept)<-[e:conceptPromotionOf]-(b:ConceptPromotion)-[f:conceptPromotionBy]->(rs:ResearchService)
+        WHERE rs.id = '%{research_service_id}'
+        RETURN  COUNT(DISTINCT(concept.id)) AS total
       Q
 
       LETTERS = <<-Q.squish
@@ -56,7 +74,22 @@ module Datagraphs
       end
 
       def all_for(letter: "A", skip: 0, limit: 25)
-        params = { query: QUERY % { skip: skip, limit: limit, letter: letter }}
+        params = { query: ALL_FOR % { skip: skip, limit: limit, letter: letter }}
+        response = call(params: params)
+        body = process_response(response.body)
+        body.map { |concept| Hashie::Mash.new(concept) }
+      end
+
+      def count_for_promoted_by(research_service_id:)
+        params = { query: COUNT_FOR_PROMOTED_BY % { research_service_id: research_service_id } }
+        response = call(params: params)
+        output = JSON.parse(response.body)
+
+        output["results"].first["total"]
+      end
+
+      def promoted_by(research_service_id:, skip: 0, limit: 25)
+        params = { query: PROMOTED_BY % { skip: skip, limit: limit, research_service_id: research_service_id }}
         response = call(params: params)
         body = process_response(response.body)
         body.map { |concept| Hashie::Mash.new(concept) }

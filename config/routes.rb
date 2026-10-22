@@ -41,6 +41,7 @@ Rails.application.routes.draw do
       get 'publications'
       get 'publications/unpublished'
       get 'sections'
+      get 'promoted-concepts'
     end
   end
 

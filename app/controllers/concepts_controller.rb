@@ -1,5 +1,3 @@
-require 'ostruct'
-
 class ConceptsController < AuthenticatedController
   include Pagy::Method
 
