@@ -1,12 +1,5 @@
 <%= render 'common_concept_info', concept: @concept %>
 
 <%= render 'tab_navigation', labelled_by: :publications, concept: @concept do %>
-  <% if @publications.present? %>
-    <% if @total_count > @pagy.limit %>
-      <%== @pagy.series_nav(:bootstrap) %>
-    <% end %>
-
-    <%= render 'publications/table', publications: @publications, pagy: @pagy, total_count: @total_count %>
-
-  <% end %>
+  <%= render 'publications/table', publications: @publications, pagy: @pagy, total_count: @total_count %>
 <% end %>

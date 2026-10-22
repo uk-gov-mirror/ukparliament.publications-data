@@ -6,22 +6,17 @@
   <% end.join(', ').html_safe %>
 </b></p>
 
-<% if @sections.present? %>
-
-  <p><%= link_to "Sections", sections_research_service_path %></p>
-  <div class="block">
-    <div class="tabs">
-      <ul class="nav-tabs" role="tablist">
-        <li role="presentation"><%= link_to 'Publications', publications_research_service_path, role: "tab", class: class_names(active: current_page?(publications_research_service_path)) %></li>
-        <li role="presentation"><%= link_to 'Sections', sections_research_service_path, role: "tab", class: class_names(active: current_page?(sections_research_service_path)) %></li>
-      </ul>
-      <div class="tab-content">
-        <div class="tab-pane active" role="tabpanel">
-          <%= render 'publications/table', publications: @publications, pagy: @pagy, total_count: @total_count %>
-        </div>
+<div class="block">
+  <div class="tabs">
+    <ul class="nav-tabs" role="tablist">
+      <li role="presentation"><%= link_to 'Publications', publications_research_service_path, role: "tab", class: class_names(active: current_page?(publications_research_service_path)) %></li>
+      <li role="presentation"><%= link_to 'Sections', sections_research_service_path, role: "tab", class: class_names(active: current_page?(sections_research_service_path)) %></li>
+      <li role="presentation"><%= link_to 'Promoted concepts', promoted_concepts_research_service_path, role: "tab", class: class_names(active: current_page?(promoted_concepts_research_service_path)) %></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" role="tabpanel">
+        <%= render 'publications/table', publications: @publications, pagy: @pagy, total_count: @total_count %>
       </div>
     </div>
   </div>
-<% else %>
-  <%= render 'publications/table', publications: @publications, pagy: @pagy, total_count: @total_count %>
-<% end %>
+</div>

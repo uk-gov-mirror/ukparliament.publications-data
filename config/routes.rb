@@ -26,6 +26,9 @@ Rails.application.routes.draw do
       get 'broader-terms'
       get 'narrower-terms'
     end
+    collection do
+      get 'promoted'
+    end
   end
 
   resources :disclaimers, only: [:index, :show]
@@ -41,6 +44,7 @@ Rails.application.routes.draw do
       get 'publications'
       get 'publications/unpublished'
       get 'sections'
+      get 'promoted-concepts'
     end
   end
 
