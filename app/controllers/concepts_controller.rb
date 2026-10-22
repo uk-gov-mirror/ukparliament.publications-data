@@ -25,6 +25,17 @@ class ConceptsController < AuthenticatedController
     redirect_to publications_concept_path(concept_id)
   end
 
+  def promoted
+    @total_count = Datagraphs::Api::GetConcepts.new.count_for_promoted_by_no_one
+    @pagy, _ = pagy(:offset, [], count: @total_count, page: params[:page], limit: 99)
+
+    @concepts = Datagraphs::Api::GetConcepts.new.promoted_by_no_one(skip: @pagy.offset, limit: @pagy.limit)
+
+    @crumb << { label: MAIN_PAGE_TITLE, url: concepts_path }
+    @crumb << { label: "Promoted", url: nil }
+    @page_title = "Promoted concepts"
+  end
+
   def publications
     concept_id = params[:id]
     @concept = Datagraphs::Api::GetConcept.new.details_for(concept_id: concept_id)

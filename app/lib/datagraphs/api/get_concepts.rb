@@ -28,6 +28,21 @@ module Datagraphs
         LIMIT %{limit}
       Q
 
+      PROMOTED_BY_NO_ONE = <<-Q.squish
+        MATCH (concept:Concept)<-[e:conceptPromotionOf]-(b:ConceptPromotion)
+        OPTIONAL MATCH (b:ConceptPromotion)-[f:conceptPromotionBy]->(rs:ResearchService)
+        RETURN concept, count(rs) AS expression_count
+        NEXT YIELD concept, expression_count
+        FILTER expression_count = 0
+        MATCH (concept)<-[s:subject]-(pw:PublicationWork)<-[r3:expressionOf]-(pe:PublicationExpression)-[r4:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
+        RETURN  DISTINCT(concept.id) AS id,
+                concept.label AS concept_name,
+                COUNT(DISTINCT pw.id) AS publications_count
+                ORDER BY concept_name ASC
+        SKIP %{skip}
+        LIMIT %{limit}
+      Q
+
       CHILD_QUERY = <<-Q.squish
         MATCH (parent:Concept)<-[r:broaderTerm]-(child:Concept)
         MATCH (child)<-[s:subject]-(pw:PublicationWork)
@@ -50,6 +65,15 @@ module Datagraphs
         MATCH (concept:Concept)<-[e:conceptPromotionOf]-(b:ConceptPromotion)-[f:conceptPromotionBy]->(rs:ResearchService)
         WHERE rs.id = '%{research_service_id}'
         RETURN  COUNT(DISTINCT(concept.id)) AS total
+      Q
+
+      COUNT_FOR_PROMOTED_BY_NO_ONE = <<-Q.squish
+        MATCH (concept:Concept)<-[e:conceptPromotionOf]-(b:ConceptPromotion)
+        OPTIONAL MATCH (b:ConceptPromotion)-[f:conceptPromotionBy]->(rs:ResearchService)
+        RETURN concept, count(rs) AS expression_count
+        NEXT YIELD concept, expression_count
+        FILTER expression_count = 0
+        RETURN COUNT(DISTINCT concept) AS total
       Q
 
       LETTERS = <<-Q.squish
@@ -75,6 +99,21 @@ module Datagraphs
 
       def all_for(letter: "A", skip: 0, limit: 25)
         params = { query: ALL_FOR % { skip: skip, limit: limit, letter: letter }}
+        response = call(params: params)
+        body = process_response(response.body)
+        body.map { |concept| Hashie::Mash.new(concept) }
+      end
+
+      def count_for_promoted_by_no_one
+        params = { query: COUNT_FOR_PROMOTED_BY_NO_ONE }
+        response = call(params: params)
+        output = JSON.parse(response.body)
+
+        output["results"].first["total"]
+      end
+
+      def promoted_by_no_one(skip: 0, limit: 25)
+        params = { query: PROMOTED_BY_NO_ONE % { skip: skip, limit: limit }}
         response = call(params: params)
         body = process_response(response.body)
         body.map { |concept| Hashie::Mash.new(concept) }
