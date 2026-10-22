@@ -16,6 +16,13 @@ module Datagraphs
              pe.createdAt AS created_at
       Q
 
+      PUBLISHED_EXPRESSION_FOR_A_WORK = <<-Q.squish
+        MATCH (pw:PublicationWork)<-[eO:expressionOf]-(pe:PublicationExpression)-[t:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
+        WHERE pw.id = '%{publication_work_id}'
+        AND pes.label = 'Published'
+        RETURN pe.id AS id
+      Q
+
       CONTRIBUTORS = <<-Q.squish
         MATCH startWithPerson = (p:Person)<-[r3:contributionBy]-(c:Contribution)-[r2:contributionTo]->(pe:PublicationExpression)
         MATCH path3 = (c:Contribution)-[r4:hasContributionType]->(ct:ContributionType)
@@ -54,6 +61,15 @@ module Datagraphs
         RETURN s.name AS name, s.id AS id
         ORDER BY s.name
       Q
+
+      def published_for(publication_work_id: 'urn:publications-data:PublicationExpression:10102')
+        params = { query: PUBLISHED_EXPRESSION_FOR_A_WORK % { publication_work_id: publication_work_id }}
+
+        response = call(params: params)
+        expression = process_response(response.body).first
+
+        Hashie::Mash.new(expression)
+      end
 
       def details(expression_id: 'urn:publications-data:PublicationExpression:69185')
         params = { query: QUERY % { expression_id: expression_id }}

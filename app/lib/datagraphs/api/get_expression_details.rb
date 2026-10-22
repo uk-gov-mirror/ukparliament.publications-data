@@ -1,14 +1,16 @@
 module Datagraphs
   module Api
-    class GetTeaserText < Base
-      def for_publication_expression(publication_expression_id: 22225)
+    class GetExpressionDetails < Base
+      def for(publication_expression_id: 22225)
         @publication_expression_id = trim_publication_expression_id(publication_expression_id)
 
         # Call is a method in base
         response = call
 
         json_response = JSON.parse(response.body)
-        json_response["teaserText"]
+        json_response.deep_transform_keys!(&:underscore)
+
+        Hashie::Mash.new(json_response)
       end
 
       def url
