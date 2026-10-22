@@ -52,23 +52,26 @@ module Datagraphs
         LIMIT %{limit}
       Q
 
-      def process(concept_id:, skip: 0, limit: 25)
+      def details_for(concept_id:, skip: 0, limit: 25)
         params = { query: QUERY % { skip: skip, limit: limit, concept_id: concept_id, except_id: $CONCEPT_CONCEPT_ID }}
 
         response = call(params: params)
-        process_response(response.body)
+        concept = process_response(response.body).first
+        Hashie::Mash.new(concept)
       end
 
       def and_broader_terms(concept_id:, skip: 0, limit: 25)
         params = { query: GET_BROADER_TERMS % { concept_id: concept_id, skip: 0, limit: 25, except_id: $CONCEPT_CONCEPT_ID }}
         response = call(params: params)
-        process_response(response.body)
+        results = process_response(response.body)
+        results.map { |result| Hashie::Mash.new(result) }
       end
 
       def and_narrower_terms(concept_id:, skip: 0, limit: 25)
         params = { query: GET_NARROWER_TERMS % { concept_id: concept_id, skip: 0, limit: 25, except_id: $CONCEPT_CONCEPT_ID }}
         response = call(params: params)
-        process_response(response.body)
+        results = process_response(response.body)
+        results.map { |result| Hashie::Mash.new(result) }
       end
     end
   end

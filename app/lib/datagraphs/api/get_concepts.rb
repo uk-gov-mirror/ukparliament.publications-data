@@ -3,7 +3,7 @@ module Datagraphs
     class GetConcepts < CypherQuery
 
       QUERY = <<-Q.squish
-        MATCH p = (broaderTerms:Concept)<-[r1:broaderTerm]-(concept:Concept)<-[r2:broaderTerm]-(narrowerTerms:Concept)
+        MATCH (broaderTerms:Concept)<-[r1:broaderTerm]-(concept:Concept)<-[r2:broaderTerm]-(narrowerTerms:Concept)
         MATCH (concept)<-[s:subject]-(pw:PublicationWork)<-[r3:expressionOf]-(pe:PublicationExpression)-[r4:hasPublicationExpressionStatus]->(pes:PublicationExpressionStatus)
         WHERE concept.alphabetisationLetter = '%{letter}'
         RETURN  DISTINCT(concept.id) AS id,
@@ -17,8 +17,8 @@ module Datagraphs
       Q
 
       CHILD_QUERY = <<-Q.squish
-        MATCH path0 = (parent:Concept)<-[r:broaderTerm]-(child:Concept)
-        MATCH path1 = (child)<-[s:subject]-(pw:PublicationWork)
+        MATCH (parent:Concept)<-[r:broaderTerm]-(child:Concept)
+        MATCH (child)<-[s:subject]-(pw:PublicationWork)
         WHERE parent.label = "%{broader_term}"
         RETURN child.label AS name,
                child.id AS id,
@@ -47,7 +47,7 @@ module Datagraphs
         process_response(response.body)
       end
 
-      def get_total(letter: 'A')
+      def count_for(letter: 'A')
         params = { query: COUNT % { letter: letter } }
         response = call(params: params)
         output = JSON.parse(response.body)
@@ -55,10 +55,11 @@ module Datagraphs
         output["results"].first["total"]
       end
 
-      def process(letter: "A", skip: 0, limit: 25)
+      def all_for(letter: "A", skip: 0, limit: 25)
         params = { query: QUERY % { skip: skip, limit: limit, letter: letter }}
         response = call(params: params)
-        process_response(response.body)
+        body = process_response(response.body)
+        body.map { |concept| Hashie::Mash.new(concept) }
       end
 
       def get_letters

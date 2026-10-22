@@ -349,7 +349,7 @@ module Datagraphs
         publications.map { |result| Hashie::Mash.new(result) }
       end
 
-      def for_a_concept_count(concept_id:)
+      def count_for_a_concept(concept_id:)
         params = { query: COUNT_FOR_A_CONCEPT % {  concept_id: concept_id }}
         response = call(params: params)
         output = JSON.parse(response.body)

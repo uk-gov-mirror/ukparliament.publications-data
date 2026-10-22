@@ -6,19 +6,17 @@ class ConceptsController < AuthenticatedController
   MAIN_PAGE_TITLE = 'Concepts'
 
   def index
-    get_letters
+    @letters = Datagraphs::Api::GetConcepts.new.get_letters.first["letters"].sort
 
     @letter = params[:letter] || "A"
-    @total_count = Datagraphs::Api::GetConcepts.new.get_total(letter: @letter)
+    @total_count = Datagraphs::Api::GetConcepts.new.count_for(letter: @letter)
     @pagy, _ = pagy(:offset, [], count: @total_count, page: params[:page], limit: 99)
 
-    concepts = Datagraphs::Api::GetConcepts.new.process(
+    @concepts = Datagraphs::Api::GetConcepts.new.all_for(
       letter: @letter,
       skip: @pagy.offset,
       limit: @pagy.limit
     )
-
-    @concepts = concepts.map { |c| OpenStruct.new(c) }
 
     @crumb << { label: MAIN_PAGE_TITLE, url: nil }
     @page_title = MAIN_PAGE_TITLE
@@ -31,14 +29,11 @@ class ConceptsController < AuthenticatedController
 
   def publications
     concept_id = params[:id]
-
-    concept = Datagraphs::Api::GetConcept.new.process(concept_id: concept_id).first
-    @concept = OpenStruct.new(concept)
+    @concept = Datagraphs::Api::GetConcept.new.details_for(concept_id: concept_id)
 
     get_publications = Datagraphs::Api::GetPublications.new
 
-    @total_count = get_publications.for_a_concept_count(concept_id: concept_id)
-
+    @total_count = get_publications.count_for_a_concept(concept_id: concept_id)
     @pagy, _ = pagy(:offset, [], count: @total_count, page: params[:page], limit: 25)
 
     @publications = get_publications.for_a_concept(
@@ -56,12 +51,9 @@ class ConceptsController < AuthenticatedController
 
   def broader_terms
     concept_id = params[:id]
-    concept = Datagraphs::Api::GetConcept.new.process(concept_id: concept_id).first
-    @concept = OpenStruct.new(concept)
+    @concept = Datagraphs::Api::GetConcept.new.details_for(concept_id: concept_id)
 
-    bt = Datagraphs::Api::GetConcept.new.and_broader_terms(concept_id: concept_id)
-    @broader_terms = bt.map { |s| OpenStruct.new(s) }
-
+    @broader_terms = Datagraphs::Api::GetConcept.new.and_broader_terms(concept_id: concept_id)
     @page_title = @concept.label
 
     @crumb << { label: MAIN_PAGE_TITLE, url: concepts_path }
@@ -71,28 +63,13 @@ class ConceptsController < AuthenticatedController
 
   def narrower_terms
     concept_id = params[:id]
-    concept = Datagraphs::Api::GetConcept.new.process(concept_id: concept_id).first
-    @concept = OpenStruct.new(concept)
+    @concept = Datagraphs::Api::GetConcept.new.details_for(concept_id: concept_id)
 
-    ns = Datagraphs::Api::GetConcept.new.and_narrower_terms(concept_id: concept_id)
-    @narrower_terms = ns.map { |s| OpenStruct.new(s) }
-
+    @narrower_terms = Datagraphs::Api::GetConcept.new.and_narrower_terms(concept_id: concept_id)
     @page_title = @concept.label
 
     @crumb << { label: MAIN_PAGE_TITLE, url: concepts_path }
     @crumb << { label: @concept.label, url: concept_path(concept_id) }
     @crumb << { label: "Narrower subjects", url: nil }
-  end
-
-  private
-
-  def get_letters
-    @letters = Datagraphs::Api::GetConcepts.new.get_letters.first["letters"].sort
-  end
-
-
-  def process_collection
-    collection_and_publication_works = Datagraphs::Api::GetCollection.new.process(params[:id])
-    collection_and_publication_works.map { |publication_works| OpenStruct.new(publication_works) }
   end
 end
