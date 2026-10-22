@@ -30,7 +30,7 @@ module Datagraphs
         OPTIONAL MATCH (pw)<-[sr1:supersedes]-(s1:Superseding)-[sr2:supersededBy]->(superpw:PublicationWork)
         OPTIONAL MATCH (supersedes)<-[sr3:supersedes]-(s2:Superseding)-[sr4:supersededBy]->(pw:PublicationWork)
         OPTIONAL MATCH (mf:PublicationWork)<-[mFrom:mergedFrom]-(merging:Merging)-[mInto:mergedInto]->(pw)
-        OPTIONAL MATCH (pw:PublicationWork)<-[mFrom2:mergedFrom]-(splitting:Merging)-[mInto2:mergedInto]->(sf)
+        OPTIONAL MATCH (pw:PublicationWork)<-[split1:splitInto]-(splitting:Splitting)-[split2:splitFrom]->(splitFromWork:PublicationWork)
         OPTIONAL MATCH (pw)-[r14:hasWithdrawalPeriod]->(wp:WithdrawalPeriod)
         OPTIONAL MATCH (area:GeographicArea)<-[e]-(pw)
         OPTIONAL MATCH (col:Collection)-[hasMember:hasMember]->(pw)
@@ -47,9 +47,9 @@ module Datagraphs
                   COLLECT_LIST(DISTINCT mf.id) AS merged_from_ids,
                   COLLECT_LIST(DISTINCT mf.title) AS merged_from_titles,
                   COLLECT_LIST(DISTINCT merging.mergedAt) AS merged_from_dates,
-                  COLLECT_LIST(DISTINCT sf.id) AS split_from_ids,
-                  COLLECT_LIST(DISTINCT sf.title) AS split_from_titles,
-                  COLLECT_LIST(DISTINCT splitting.mergedAt) AS split_from_dates,
+                  COLLECT_LIST(DISTINCT splitFromWork.id) AS split_from_ids,
+                  COLLECT_LIST(DISTINCT splitFromWork.title) AS split_from_titles,
+                  COLLECT_LIST(DISTINCT splitting.splitAt) AS split_from_dates,
                   COLLECT_LIST(DISTINCT wp) AS wps,
                   COLLECT_LIST(DISTINCT c) AS concepts,
                   COLLECT_LIST(DISTINCT supersedes.id) AS supersedes_ids,
@@ -58,7 +58,7 @@ module Datagraphs
                   COLLECT_LIST(DISTINCT superpw.id) AS superseded_by_ids,
                   COLLECT_LIST(DISTINCT superpw.title) AS superseded_by_titles,
                   COLLECT_LIST(DISTINCT s1.supersededAt) AS superseded_by_ats,
-                  COLLECT_LIST(DISTINCT sf) AS split_from,
+                  COLLECT_LIST(DISTINCT splitFromWork) AS split_from,
                   COLLECT_LIST(DISTINCT mf) AS merged_from,
                   COLLECT_LIST(DISTINCT area) AS geographic_areas
       Q
