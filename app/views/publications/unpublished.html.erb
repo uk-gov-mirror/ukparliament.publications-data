@@ -7,7 +7,7 @@
 
     <div class="tab-content">
       <div class="tab-pane active" role="tabpanel">
-        <%#= render 'publications/table', publications: @publications, pagy: @pagy, total_count: @total_count %>
+        <%= render 'publications/unpublished_table', publications: @publications, pagy: @pagy, total_count: @total_count %>
       </div>
     </div>
   </div>
