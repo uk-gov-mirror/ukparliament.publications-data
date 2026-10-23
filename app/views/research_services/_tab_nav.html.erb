@@ -1,0 +1,6 @@
+<ul class="nav-tabs" role="tablist">
+  <li role="presentation"><%= link_to 'Publications', publications_research_service_path, role: "tab", class: class_names(active: current_page?(publications_research_service_path)) %></li>
+  <li role="presentation"><%= link_to 'Sections', sections_research_service_path, role: "tab", class: class_names(active: current_page?(sections_research_service_path)) %></li>
+  <li role="presentation"><%= link_to 'Promoted concepts', promoted_concepts_research_service_path, role: "tab", class: class_names(active: current_page?(promoted_concepts_research_service_path)) %></li>
+  <li role="presentation"><%= link_to 'Promoted collections', promoted_collections_research_service_path, role: "tab", class: class_names(active: current_page?(promoted_collections_research_service_path)) %></li>
+</ul>
