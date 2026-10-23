@@ -1,3 +1,5 @@
+<%# locals: (this_path: root_path) %>
+
 <ul class="nav-tabs" role="tablist">
   <li role="presentation"><%= link_to 'Publications', publications_house_path, role: "tab", class: class_names(active: current_page?(publications_house_path)) %></li>
   <li role="presentation"><%= link_to 'Research services', research_services_house_path, role: "tab", class: class_names(active: current_page?(research_services_house_path)) %></li>
