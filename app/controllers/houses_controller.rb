@@ -29,17 +29,35 @@ class HousesController < AuthenticatedController
 
   def business_item_weeks_for_a_year
     house_id = params[:id]
-    year = params[:year]
+    @year = params[:year]
     @house = Datagraphs::Api::GetHouse.new.details(house_id)
 
-    @week_numbers = Datagraphs::Api::GetBusinessItems.new.weeks_for_a_house_and_year(house_id: house_id, year: year)
+    @week_numbers = Datagraphs::Api::GetBusinessItems.new.weeks_for_a_house_and_year(house_id: house_id, year: @year)
 
     @page_title =  @house.name
 
     @crumb << { label: MAIN_PAGE_TITLE, url: houses_path }
     @crumb << { label: @house.name, url: house_path(house_id) }
     @crumb << { label: "Business items", url: business_items_house_path(house_id: house_id) }
-    @crumb << { label: year, url: nil }
+    @crumb << { label: @year, url: nil }
+  end
+
+  def business_items_for_a_week
+    house_id = params[:id]
+    @year = params[:year]
+    @week_number = params[:week_number]
+    @house = Datagraphs::Api::GetHouse.new.details(house_id)
+
+    @business_items = Datagraphs::Api::GetBusinessItems.new.for(house_id: house_id, year: @year, week_number: @week_number)
+
+    @page_title =  @house.name
+
+    @crumb << { label: MAIN_PAGE_TITLE, url: houses_path }
+    @crumb << { label: @house.name, url: house_path(house_id) }
+    @crumb << { label: "Business items", url: business_items_house_path(house_id: house_id) }
+    @crumb << { label: @year, url: business_item_weeks_for_a_year_and_house_path(house_id: house_id, year: @year) }
+    @crumb << { label: "Week number - #{@week_number}", url: nil }
+
   end
 
   def business_items_for_a_year

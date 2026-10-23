@@ -1,6 +1,6 @@
 <ul class="nav-tabs" role="tablist">
   <li role="presentation"><%= link_to 'Publications', publications_house_path, role: "tab", class: class_names(active: current_page?(publications_house_path)) %></li>
   <li role="presentation"><%= link_to 'Research services', research_services_house_path, role: "tab", class: class_names(active: current_page?(research_services_house_path)) %></li>
-  <li role="presentation"><%= link_to 'Business items', business_items_house_path, role: "tab", class: class_names(active: current_page?(business_items_house_path)) %></li>
+  <li role="presentation"><%= link_to 'Business items', business_items_house_path, role: "tab", class: class_names(active: current_page?(this_path)) %></li>
   <li role="presentation"><%#= link_to 'Unpublished publications', promoted_concepts_research_service_path, role: "tab", class: class_names(active: current_page?(promoted_concepts_research_service_path)) %></li>
 </ul>

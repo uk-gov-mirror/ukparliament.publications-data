@@ -12,6 +12,7 @@ Rails.application.routes.draw do
       get 'research-services'
       get 'business-items'
       get 'business-items/:year/', to: "houses#business_item_weeks_for_a_year", as: :business_item_weeks_for_a_year_and
+      get 'business-items/:year/week-:week_number', to: "houses#business_items_for_a_week", as: :business_items_for_a_week_and
       get 'research-services'
       get 'publications'
       get 'publications/unpublished', to: "houses#unpublished"
