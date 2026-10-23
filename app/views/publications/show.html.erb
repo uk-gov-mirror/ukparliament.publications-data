@@ -138,6 +138,15 @@
   </div>
 <% end %>
 
+<h3>Business items</h3>
+<% if @optional_extras.business_item_objects.any? %>
+  <% @optional_extras.business_item_objects.each do |bi| %>
+    <%= bi.label %> (Note this will eventually be a link)
+  <% end %>
+<% else %>
+  <p>We do not have any business items</p>
+<% end %>
+
 <h3>Associated concepts</h3>
 <% if @optional_extras.concepts.any? %>
   <% @optional_extras.concepts.each do |c| %>

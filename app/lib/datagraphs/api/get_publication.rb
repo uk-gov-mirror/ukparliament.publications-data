@@ -35,6 +35,7 @@ module Datagraphs
         OPTIONAL MATCH (area:GeographicArea)<-[e]-(pw)
         OPTIONAL MATCH (col:Collection)-[hasMember:hasMember]->(pw)
         OPTIONAL MATCH (leadOfCollection:Collection)-[hasLeadMember:hasLeadMember]->(pw)
+        OPTIONAL MATCH (pw)-[r:pertainsTo]->(bi:BusinessItem)
         WHERE pw.id='%{publication_work_id}'
         RETURN
                   COLLECT_LIST(DISTINCT col.id) AS collection_ids,
@@ -60,7 +61,8 @@ module Datagraphs
                   COLLECT_LIST(DISTINCT s1.supersededAt) AS superseded_by_ats,
                   COLLECT_LIST(DISTINCT splitFromWork) AS split_from,
                   COLLECT_LIST(DISTINCT mf) AS merged_from,
-                  COLLECT_LIST(DISTINCT area) AS geographic_areas
+                  COLLECT_LIST(DISTINCT area) AS geographic_areas,
+                  COLLECT_LIST(DISTINCT bi) AS business_item_objects
       Q
 
       PUBLICATION_ONLY = <<-Q.squish
