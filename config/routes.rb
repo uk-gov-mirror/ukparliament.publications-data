@@ -7,9 +7,11 @@ Rails.application.routes.draw do
   get '/' => 'home#index', as: :home
 
   resources :houses, only: [:index, :show] do
+
     member do
       get 'research-services'
       get 'business-items'
+      get 'business-items/:year/', to: "houses#business_item_weeks_for_a_year", as: :business_item_weeks_for_a_year_and
       get 'research-services'
       get 'publications'
       get 'publications/unpublished', to: "houses#unpublished"
