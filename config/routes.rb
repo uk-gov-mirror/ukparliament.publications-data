@@ -9,6 +9,8 @@ Rails.application.routes.draw do
   resources :houses, only: [:index, :show] do
     member do
       get 'research-services'
+      get 'business-items'
+      get 'research-services'
       get 'publications'
       get 'publications/unpublished', to: "houses#unpublished"
     end

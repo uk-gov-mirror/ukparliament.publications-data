@@ -14,6 +14,28 @@ class HousesController < AuthenticatedController
     redirect_to publications_house_path(params[:id])
   end
 
+  def business_items
+    house_id = params[:id]
+    @house = Datagraphs::Api::GetHouse.new.details(house_id)
+
+    @page_title =  @house.name
+
+    @crumb << { label: MAIN_PAGE_TITLE, url: houses_path }
+    @crumb << { label: @house.name, url: house_path(house_id) }
+    @crumb << { label: "Business items", url: nil }
+  end
+
+  def research_services
+    house_id = params[:id]
+    @house = Datagraphs::Api::GetHouse.new.details(house_id)
+
+    @page_title =  @house.name
+
+    @crumb << { label: MAIN_PAGE_TITLE, url: houses_path }
+    @crumb << { label: @house.name, url: house_path(house_id) }
+    @crumb << { label: "Research services", url: nil }
+  end
+
   def publications
     house_id = params[:id]
 

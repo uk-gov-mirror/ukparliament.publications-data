@@ -1,0 +1,17 @@
+<h1><small class="text-muted"><%= @house.short_name %></small></h1>
+
+<div class="block">
+  <div class="tabs">
+    <%= render 'tab_nav' %>
+
+    <div class="tab-content">
+      <div class="tab-pane active" role="tabpanel">
+        <ol>
+          <% @house.research_services.each do |id, name| %>
+            <li><%= link_to name, research_service_path(id) %></li>
+          <% end %>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
