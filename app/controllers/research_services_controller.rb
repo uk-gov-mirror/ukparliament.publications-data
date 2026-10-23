@@ -75,4 +75,27 @@ class ResearchServicesController < AuthenticatedController
     @crumb << { label: @page_title, url: research_service_path(research_service_id) }
     @crumb << { label: 'Promoted concepts', url: nil }
   end
+
+  def promoted_collections
+    research_service_id = params[:id]
+    @research_service = Datagraphs::Api::GetResearchService.new.details(research_service_id)
+
+    get_collections = Datagraphs::Api::GetCollections.new
+
+    @total_count = get_collections.count_for_promoted_by(research_service_id: research_service_id)
+
+    @pagy, _ = pagy(:offset, [], count: @total_count, page: params[:page], limit: 25)
+
+    @collections = get_collections.promoted_by(
+      research_service_id: research_service_id,
+      skip: @pagy.offset,
+      limit: @pagy.limit
+    )
+
+    @page_title =  @research_service.name
+
+    @crumb << { label: 'Research services', url: research_services_path }
+    @crumb << { label: @page_title, url: research_service_path(research_service_id) }
+    @crumb << { label: 'Promoted concepts', url: nil }
+  end
 end
