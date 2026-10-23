@@ -1,0 +1,35 @@
+<h1><small class="text-muted">Week <%= @week_number %> in <%= @year %></small></h1>
+
+<div class="block">
+  <div class="tabs">
+    <%= render 'tab_nav', this_path: business_items_for_a_week_and_house_path %>
+
+    <div class="tab-content">
+      <div class="tab-pane active" role="tabpanel">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Item</th>
+              <th scope="col">Meeting type</th>
+              <th scope="col">Ordinality</th>
+              <th scope="col">Publication</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @business_items.each do |business_item| %>
+              <tr>
+                <th scope="row"><%= business_item.on_date %></th>
+                <td><%= business_item.label %></td>
+                <td><%= business_item.meeting_type_label %></td>
+                <td><%= business_item.ordinality %></td>
+                <td><%= link_to business_item.publication_work_title, publication_path(business_item.publication_work_id) %></td>
+
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
