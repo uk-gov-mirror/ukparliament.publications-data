@@ -1,0 +1,38 @@
+<%# This helps us default the path helper if it hasn't been set anywhere %>
+<%# locals: (path_helper: :publication_path, publications:, pagy:, total_count:, people: 'contributors') %>
+
+<% if publications.any? %>
+  <p>Total publications: <%= total_count %></p>
+  <%== pagy.series_nav(:bootstrap) if total_count > pagy.limit %>
+   <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th scope="col" class="col-4">Title</th>
+          <th scope="col"><%= people.capitalize %></th>
+          <th scope="col">Updated at</th>
+          <th scope="col">Status</th>
+          <th scope="col">Published by</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% publications.each do |publication| %>
+          <tr>
+            <%# This is slightly funky, but allows us to have different paths for things like data dashboards, whilst sharing the partial %>
+            <td><%= link_to publication.title, public_send(path_helper, publication.publication_work_id) %></td>
+            <td>
+              <% if publication.contributors.empty? %>
+                No <%= people %> found
+              <% else %>
+                <%= contributor_links_from_array(publication.contributors) %>
+              <% end %>
+            </td>
+            <td><%= nice_date_time(publication.updated_at) %></td>
+            <td><%= publication.status %></td>
+            <td><%= link_to publication.short_research_service_name, research_service_path(publication.research_service_id) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+<% else %>
+  <h2>No publications</h2>
+<% end %>

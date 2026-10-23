@@ -4,7 +4,7 @@ class PublicationsController < AuthenticatedController
   include Pagy::Method
   include ApplicationHelper # For nice date time
 
-  MAIN_PAGE_TITLE = 'Published publications'
+  MAIN_PAGE_TITLE = 'Publications'
   DEFAULT_PAGE_SIZE = 25
 
   def index
@@ -15,8 +15,26 @@ class PublicationsController < AuthenticatedController
 
     @publications = get_publications.all(skip: @pagy.offset, limit: @pagy.limit)
 
-    @crumb << { label: MAIN_PAGE_TITLE, url: nil }
+    @crumb << { label: MAIN_PAGE_TITLE, url: publications_path }
+    @crumb << { label: 'Published', url: nil }
+
     @page_title = MAIN_PAGE_TITLE
+  end
+
+  def unpublished
+    @total_count = Datagraphs::Api::GetUnpublishedPublications.new.get_total
+
+    @pagy, _ = pagy(:offset, [], count: @total_count, page: params[:page], limit: 25)
+
+    @publications = Datagraphs::Api::GetUnpublishedPublications.new.all(
+      skip: @pagy.offset,
+      limit: @pagy.limit
+    )
+
+    @page_title = MAIN_PAGE_TITLE
+
+    @crumb << { label: MAIN_PAGE_TITLE, url: publications_path }
+    @crumb << { label: 'Unpublished', url: nil }
   end
 
   def show
