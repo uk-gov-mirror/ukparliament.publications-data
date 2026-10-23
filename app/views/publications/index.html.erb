@@ -1,3 +1,14 @@
-<p><%= link_to 'Publications (unpublished)', unpublished_publications_path %></p>
+<div class="block">
+  <div class="tabs">
+    <ul class="nav-tabs" role="tablist">
+      <li role="presentation"><%= link_to 'Published', publications_path, role: "tab", class: class_names(active: current_page?(publications_path)) %></li>
+      <li role="presentation"><%= link_to 'Unpublished', unpublished_publications_path, role: "tab", class: class_names(active: current_page?(unpublished_publications_path)) %></li>
+    </ul>
 
-<%= render 'publications/table', publications: @publications, pagy: @pagy, total_count: @total_count %>
+    <div class="tab-content">
+      <div class="tab-pane active" role="tabpanel">
+        <%= render 'publications/table', publications: @publications, pagy: @pagy, total_count: @total_count %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -4,7 +4,7 @@ class PublicationsController < AuthenticatedController
   include Pagy::Method
   include ApplicationHelper # For nice date time
 
-  MAIN_PAGE_TITLE = 'Published publications'
+  MAIN_PAGE_TITLE = 'Publications'
   DEFAULT_PAGE_SIZE = 25
 
   def index
@@ -15,7 +15,9 @@ class PublicationsController < AuthenticatedController
 
     @publications = get_publications.all(skip: @pagy.offset, limit: @pagy.limit)
 
-    @crumb << { label: MAIN_PAGE_TITLE, url: nil }
+    @crumb << { label: MAIN_PAGE_TITLE, url: publications_path }
+    @crumb << { label: 'Published', url: nil }
+
     @page_title = MAIN_PAGE_TITLE
   end
 
@@ -31,8 +33,12 @@ class PublicationsController < AuthenticatedController
 
     @publications = publications.map { |pub| OpenStruct.new(pub) }
 
-    @crumb << { label: MAIN_PAGE_TITLE, url: nil }
     @page_title = MAIN_PAGE_TITLE
+
+
+    @crumb << { label: MAIN_PAGE_TITLE, url: publications_path }
+    @crumb << { label: 'Unpublished', url: nil }
+
   end
 
   def show
