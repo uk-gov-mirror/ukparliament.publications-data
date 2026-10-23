@@ -18,6 +18,8 @@ class HousesController < AuthenticatedController
     house_id = params[:id]
     @house = Datagraphs::Api::GetHouse.new.details(house_id)
 
+    @years = Datagraphs::Api::GetBusinessItems.new.years_for_a_house(house_id: house_id)
+
     @page_title =  @house.name
 
     @crumb << { label: MAIN_PAGE_TITLE, url: houses_path }
