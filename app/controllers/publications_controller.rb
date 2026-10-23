@@ -38,7 +38,10 @@ class PublicationsController < AuthenticatedController
   def sort_out_publication_details(get_publication = Datagraphs::Api::GetPublication.new)
 
     published_expression_id = @publication.published_expression_id
-    @teaser_text = Datagraphs::Api::GetTeaserText.new.for_publication_expression(publication_expression_id: published_expression_id)
+    expression_details = Datagraphs::Api::GetExpressionDetails.new.for(publication_expression_id: published_expression_id)
+
+    @teaser_text = expression_details.teaser_text
+    @summary = expression_details.summary
 
     @optional_extras = get_publication.and_optional_extras(publication_work_id: @publication_work_id)
     @related_links = get_publication.and_related_links(publication_work_id: @publication_work_id)
