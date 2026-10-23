@@ -28,11 +28,26 @@ module Datagraphs
         ORDER BY years ASC
       Q
 
+      WEEKS_FOR_A_HOUSE_AND_A_YEAR = <<-Q.squish
+        MATCH (businessItem:BusinessItem)-[r:businessItemInHouse]->(house:House)
+        WHERE house.id = '%{house_id}'
+        AND businessItem.year = %{year}
+        RETURN COLLECT_LIST(distinct(businessItem.weekNumber)) AS week_numbers
+        ORDER BY week_numbers ASC
+      Q
+
       def years_for_a_house(house_id:)
         params = { query: YEARS_FOR_A_HOUSE % { house_id: house_id } }
         response = call(params: params)
         body = process_response(response.body)
         body.first["years"]
+      end
+
+      def weeks_for_a_house_and_year(house_id: 'urn:publications-data:House:1', year: 2026)
+        params = { query: WEEKS_FOR_A_HOUSE_AND_A_YEAR % { house_id: house_id, year: year } }
+        response = call(params: params)
+        body = process_response(response.body)
+        body.first["week_numbers"]
       end
 
       def for_a_house_and_year(house_id: 'urn:publications-data:House:1', year: 2026)

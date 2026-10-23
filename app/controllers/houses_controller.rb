@@ -27,6 +27,36 @@ class HousesController < AuthenticatedController
     @crumb << { label: "Business items", url: nil }
   end
 
+  def business_item_weeks_for_a_year
+    house_id = params[:id]
+    year = params[:year]
+    @house = Datagraphs::Api::GetHouse.new.details(house_id)
+
+    @week_numbers = Datagraphs::Api::GetBusinessItems.new.weeks_for_a_house_and_year(house_id: house_id, year: year)
+
+    @page_title =  @house.name
+
+    @crumb << { label: MAIN_PAGE_TITLE, url: houses_path }
+    @crumb << { label: @house.name, url: house_path(house_id) }
+    @crumb << { label: "Business items", url: business_items_house_path(house_id: house_id) }
+    @crumb << { label: year, url: nil }
+  end
+
+  def business_items_for_a_year
+    house_id = params[:id]
+    year = params[:year]
+    @house = Datagraphs::Api::GetHouse.new.details(house_id)
+
+    @week_numbers = Datagraphs::Api::GetBusinessItems.new.weeks_for_a_house_and_year(house_id: house_id, year: year)
+
+    @page_title =  @house.name
+
+    @crumb << { label: MAIN_PAGE_TITLE, url: houses_path }
+    @crumb << { label: @house.name, url: house_path(house_id) }
+    @crumb << { label: "Business items", url: business_items_house_path(house_id: house_id) }
+    @crumb << { label: year, url: nil }
+  end
+
   def research_services
     house_id = params[:id]
     @house = Datagraphs::Api::GetHouse.new.details(house_id)

@@ -8,7 +8,7 @@
       <div class="tab-pane active" role="tabpanel">
         <ul>
           <% @years.each do |year| %>
-            <li><%= year %></li>
+            <li><%= link_to year, business_item_weeks_for_a_year_and_house_path(@house.id, year) %></li>
           <% end %>
         </ul>
       </div>

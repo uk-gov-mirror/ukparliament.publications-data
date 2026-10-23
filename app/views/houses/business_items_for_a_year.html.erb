@@ -1,0 +1,17 @@
+<h1><small class="text-muted"><%= @house.short_name %></small></h1>
+
+<div class="block">
+  <div class="tabs">
+    <%= render 'tab_nav' %>
+
+    <div class="tab-content">
+      <div class="tab-pane active" role="tabpanel">
+        <ul>
+          <% @business_items.each do |business_item| %>
+            <li><%= business_item.meeting_type_label %> Ordinality: <%= business_item.ordinality %> On date: <%= business_item.on_date %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

@@ -5,6 +5,7 @@ module Datagraphs
         MATCH houses=(house:House)<-[r1:for]-(rs:ResearchService)
         WHERE house.id='%{house_id}'
         RETURN house.name             AS name,
+               house.id               AS id,
                house.shortName        AS short_name,
                COLLECT_LIST(rs.id)    AS research_service_ids,
                COLLECT_LIST(rs.name)  AS research_service_names
